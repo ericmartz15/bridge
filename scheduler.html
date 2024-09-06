@@ -170,25 +170,31 @@
         console.log("Data received:", data);
 
         if (data) {
-          let staffers = data.map(
-            (response) =>
-              new Staffer(
-                response.fullName,
-                response.preferences,
-                response.doubleStaffedSelection,
-                response.floater
-              )
-          );
+          // Select only the first 5 staffers from the fetched data
+          let staffers = data
+            // .slice(0, 5)
+            .map(
+              (response) =>
+                new Staffer(
+                  response.fullName,
+                  response.preferences,
+                  response.doubleStaffedSelection,
+                  response.floater
+                )
+            );
 
+          // Create only the first 5 shifts (for Monday)
           let shifts = [];
           for (let i = 0; i < 35; i++) {
             shifts.push(new Shift(i));
           }
+
           console.log("Staffers: ", staffers);
           let scheduler = new CSP(staffers, shifts);
           let schedule = scheduler.solve();
           console.log("Schedule:", schedule);
 
+          // Update the calendar grid with the scheduled staffers
           for (let shiftIndex in schedule) {
             let staffers = schedule[shiftIndex];
             let cell = document.querySelector(`[data-shift="${shiftIndex}"]`);
