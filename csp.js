@@ -1,7 +1,8 @@
 class CSP {
-  constructor(staffers, shifts) {
+  constructor(staffers, shifts, settings) {
     this.shifts = shifts;
     this.staffers = staffers.filter((staffer) => !staffer.floater);
+    this.threshold = settings;
     this.domains = this.assignDomains();
     this.numStaffers = this.staffers.length;
     this.solution = null;
@@ -12,7 +13,7 @@ class CSP {
     this.phase = 1; // Start with phase 1
     this.solutionCount = 0;
     this.noNewSolutionCount = 0;
-    this.maxNoNewSolutionCount = 50;
+    this.maxNoNewSolutionCount = 100;
     this.solutionsSet = new Set(); // Initialize an empty set
   }
 
@@ -21,7 +22,7 @@ class CSP {
     for (let shift of this.shifts) {
       domains[shift.index] = this.staffers.filter((staffer) => {
         let score = staffer.getPreferenceScore(shift);
-        return score > 1; // Exclude NOOO
+        return score > this.threshold;
       });
     }
     const domainNames = this.getDomainNames(domains);
@@ -38,7 +39,7 @@ class CSP {
   solve() {
     const assignment = {};
     this.backtrack(assignment, this.domains);
-    console.log("Best solution: ", this.bestSolution);
+    // console.log("Best solution: ", this.bestSolution);
     return this.bestSolution;
   }
 
@@ -63,7 +64,7 @@ class CSP {
       this.solutionCount++;
       this.noNewSolutionCount = 0;
       if (score > this.bestScore) {
-        // console.log("New best solution found");
+        console.log("New best solution found");
         console.log(`Score for this solution: ${score}`);
         this.bestScore = score;
         this.bestSolution = JSON.parse(JSON.stringify(assignment));
@@ -72,7 +73,7 @@ class CSP {
         //   "Complete assignment found but not better than the best one."
         // );
       }
-      // console.log("Solution count: ", this.solutionCount);
+      console.log("Solution count: ", this.solutionCount);
       return;
     }
 
@@ -181,71 +182,71 @@ class CSP {
   }
 
   forwardCheck(shiftIndex, domains, staffer) {
-    let conflictThreshold = 2;
-    let conflicts = 0;
+    // let conflictThreshold = 2;
+    // let conflicts = 0;
 
-    for (let otherShiftIndex in domains) {
-      if (otherShiftIndex != shiftIndex) {
-        if (domains[otherShiftIndex].length <= 3) {
-          // Only prune when the domain is small
-          let newDomain = domains[otherShiftIndex].filter(
-            (s) => s.name !== staffer.name
-          );
+    // for (let otherShiftIndex in domains) {
+    //   if (otherShiftIndex != shiftIndex) {
+    //     if (domains[otherShiftIndex].length <= 3) {
+    //       // Only prune when the domain is small
+    //       let newDomain = domains[otherShiftIndex].filter(
+    //         (s) => s.name !== staffer.name
+    //       );
 
-          if (newDomain.length === 0) {
-            return false;
-          }
+    //       if (newDomain.length === 0) {
+    //         return false;
+    //       }
 
-          if (newDomain.length < domains[otherShiftIndex].length) {
-            conflicts++;
-          }
+    //       if (newDomain.length < domains[otherShiftIndex].length) {
+    //         conflicts++;
+    //       }
 
-          if (conflicts > conflictThreshold) {
-            return false;
-          }
+    //       if (conflicts > conflictThreshold) {
+    //         return false;
+    //       }
 
-          domains[otherShiftIndex] = newDomain;
-        }
-      }
-    }
+    //       domains[otherShiftIndex] = newDomain;
+    //     }
+    //   }
+    // }
 
     return true;
   }
 
-  // selectUnassignedShift(assignment) {
-  //   let unassignedShifts = this.shifts.filter(
-  //     (shift) =>
-  //       (this.phase === 1 &&
-  //         (!assignment[shift.index] || assignment[shift.index].length < 1)) ||
-  //       (this.phase === 2 && assignment[shift.index].length < 2)
-  //   );
-  //   let selectedShift = unassignedShifts.reduce((a, b) =>
-  //     this.domains[a.index].length < this.domains[b.index].length ? a : b
-  //   );
-  //   return selectedShift;
-  // }
   selectUnassignedShift(assignment) {
-    // Filter unassigned shifts based on the current phase
-    let unassignedShifts = this.shifts.filter((shift) => {
-      if (this.phase === 1) {
-        return !assignment[shift.index] || assignment[shift.index].length < 1;
-      } else if (this.phase === 2) {
-        return assignment[shift.index] && assignment[shift.index].length < 2;
-      }
-      return false;
-    });
-
-    if (unassignedShifts.length === 0) {
-      return null; // No unassigned shifts left
-    }
-
-    // Select the shift with the smallest domain size
+    let unassignedShifts = this.shifts.filter(
+      (shift) =>
+        (this.phase === 1 &&
+          (!assignment[shift.index] || assignment[shift.index].length < 1)) ||
+        (this.phase === 2 && assignment[shift.index].length < 2)
+    );
     let selectedShift = unassignedShifts.reduce((a, b) =>
       this.domains[a.index].length < this.domains[b.index].length ? a : b
     );
-
     return selectedShift;
   }
+  // selectUnassignedShift(assignment) {
+  //   // Filter unassigned shifts based on the current phase
+  //   let unassignedShifts = this.shifts.filter((shift) => {
+  //     if (this.phase === 1) {
+  //       return !assignment[shift.index] || assignment[shift.index].length < 1;
+  //     } else if (this.phase === 2) {
+  //       return assignment[shift.index] && assignment[shift.index].length < 2;
+  //     }
+  //     return false;
+  //   });
+
+  //   if (unassignedShifts.length === 0) {
+  //     return null; // No unassigned shifts left
+  //   }
+
+  //   // Select the shift with the smallest domain size
+  //   let selectedShift = unassignedShifts.reduce((a, b) =>
+  //     this.domains[a.index].length < this.domains[b.index].length ? a : b
+  //   );
+
+  //   return selectedShift;
+  // }
 
   isConsistent(staffer, shiftIndex, assignment) {
     if (this.assignedShifts[staffer.name]) {

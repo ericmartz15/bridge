@@ -6,6 +6,30 @@
   </head>
   <body>
     <h1>Shift Scheduler</h1>
+
+    <!-- Settings -->
+    <label for="settings">Settings:</label>
+    <select id="settings">
+      <option value="0">
+        Okay: schedule people for shifts they say they could make, i.e. everyone
+        gets a shift they did not mark NOOO for.
+      </option>
+      <option value="1">
+        Great: only schedule if everyone gets a shift they marked as "Great!" or
+        "OK"
+      </option>
+      <option value="2">
+        Ideal: only schedule if everyone gets a shift they marked as "Great!"
+        (note: this is likely not possible)
+      </option>
+    </select>
+
+    <!-- Scheduling message -->
+    <p id="message" style="color: red; display: none">
+      No schedule could be configured with the chosen settings. Try again with
+      looser requirements.
+    </p>
+
     <table>
       <!-- Create the calendar-like grid -->
       <thead>
@@ -170,6 +194,7 @@
         // console.log("Data received:", data);
 
         if (data) {
+          let settings = parseInt(document.getElementById("settings").value);
           // Select only the first 5 staffers from the fetched data
           let staffers = data
             // .slice(0, 5)
@@ -190,21 +215,26 @@
           }
 
           // console.log("Staffers: ", staffers);
-          let scheduler = new CSP(staffers, shifts);
+          let scheduler = new CSP(staffers, shifts, settings);
           let schedule = scheduler.solve();
           // console.log("Schedule:", schedule);
 
-          // Update the calendar grid with the scheduled staffers
-          for (let shiftIndex in schedule) {
-            let staffers = schedule[shiftIndex];
-            let cell = document.querySelector(`[data-shift="${shiftIndex}"]`);
-            if (cell) {
-              cell.textContent = staffers
-                .map((staffer) => staffer.name)
-                .join(", ");
+          if (schedule === null) {
+            document.getElementById("message").style.display = "block"; // Show message if no schedule found
+          } else {
+            document.getElementById("message").style.display = "none"; // Hide message
+            // Update the calendar grid with the scheduled staffers
+            for (let shiftIndex in schedule) {
+              let staffers = schedule[shiftIndex];
+              let cell = document.querySelector(`[data-shift="${shiftIndex}"]`);
+              if (cell) {
+                cell.textContent = staffers
+                  .map((staffer) => staffer.name)
+                  .join(", ");
+              }
             }
+            console.log("Scheduling completed");
           }
-          console.log("Scheduling completed");
         }
       }
 
