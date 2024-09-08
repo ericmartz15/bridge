@@ -10,6 +10,10 @@ class CSP {
     this.assignedShifts = {};
     this.backtrackCallCount = 0;
     this.phase = 1; // Start with phase 1
+    this.solutionCount = 0;
+    this.noNewSolutionCount = 0;
+    this.maxNoNewSolutionCount = 50;
+    this.solutionsSet = new Set(); // Initialize an empty set
   }
 
   assignDomains() {
@@ -17,11 +21,10 @@ class CSP {
     for (let shift of this.shifts) {
       domains[shift.index] = this.staffers.filter((staffer) => {
         let score = staffer.getPreferenceScore(shift);
-        return score > 0; // Exclude NOOO
+        return score > 1; // Exclude NOOO
       });
     }
     const domainNames = this.getDomainNames(domains);
-    console.log(`Initial domains:`, JSON.stringify(domainNames));
     return domains;
   }
 
@@ -34,103 +37,77 @@ class CSP {
 
   solve() {
     const assignment = {};
-    this.solution = this.backtrack(assignment, this.domains);
-    return this.solution;
+    this.backtrack(assignment, this.domains);
+    console.log("Best solution: ", this.bestSolution);
+    return this.bestSolution;
   }
 
   backtrack(assignment, domains) {
-    this.backtrackCallCount++; // Increment counter
+    this.backtrackCallCount++;
+    if (this.backtrackCallCount % 100 == 0) {
+      console.log(`\n--- Backtrack call #${this.backtrackCallCount} ---`);
+    }
+    if (this.noNewSolutionCount >= this.maxNoNewSolutionCount) {
+      // console.log(
+      //   "Stopping due to 100 backtrack calls without a new solution."
+      // );
+      return;
+    }
 
-    console.log(`\n--- Backtrack call #${this.backtrackCallCount} ---`);
-    console.log(`Current assignment:`, JSON.stringify(assignment));
-
-    // If every shift has 1 or 2 staffers assigned, we're done
     if (
       Object.keys(assignment).length === this.shifts.length &&
       this.allShiftsHaveMinStaffers(assignment) &&
       this.allStaffersAssigned(assignment)
     ) {
       let score = this.calculateScore(assignment);
-      console.log(`Complete assignment found. Score: ${score}`);
+      this.solutionCount++;
+      this.noNewSolutionCount = 0;
       if (score > this.bestScore) {
-        console.log(`New best score found: ${score}`);
+        // console.log("New best solution found");
+        console.log(`Score for this solution: ${score}`);
         this.bestScore = score;
-        this.bestSolution = { ...assignment };
+        this.bestSolution = JSON.parse(JSON.stringify(assignment));
+      } else {
+        // console.log(
+        //   "Complete assignment found but not better than the best one."
+        // );
       }
-      return this.bestSolution; // Return the best solution found
+      // console.log("Solution count: ", this.solutionCount);
+      return;
     }
 
-    // Check if all shifts have at least one staffer assigned in Phase 1
+    this.noNewSolutionCount++;
+
     if (this.phase === 1 && this.allShiftsHaveMinStaffers(assignment)) {
-      console.log("Phase 1 complete. Moving to Phase 2.");
       this.phase = 2; // Move to Phase 2
     }
 
     let shift = this.selectUnassignedShift(assignment);
-    console.log(`Selected unassigned shift:`, shift ? shift.index : "None");
 
     if (!shift) {
-      console.log(`No unassigned shifts remaining, returning null.`);
-      return null;
+      return;
     }
 
-    let domainCopy = JSON.parse(JSON.stringify(domains)); // Make a deep copy of domains
-    console.log(
-      `Domain copy created for backtracking:`,
-      JSON.stringify(this.getDomainNames(domainCopy))
-    );
+    let domainCopy = JSON.parse(JSON.stringify(domains));
 
     for (let staffer of this.orderDomainValues(shift.index, assignment)) {
-      console.log(
-        `Trying to assign staffer ${staffer.name} to shift ${shift.index}`
-      );
-
       if (this.isConsistent(staffer, shift.index, assignment)) {
-        console.log(
-          `Staffer ${staffer.name} is consistent with shift ${shift.index}`
-        );
         if (!assignment[shift.index]) {
           assignment[shift.index] = [];
         }
         assignment[shift.index].push(staffer);
         this.assignedShifts[staffer.name] = shift.index;
-        console.log(`Assigned staffer ${staffer.name} to shift ${shift.index}`);
-        console.log(`Current assignment:`, JSON.stringify(assignment));
 
-        // Perform forward checking
         if (this.forwardCheck(shift.index, domains, staffer)) {
-          console.log(
-            `Forward check passed for staffer ${staffer.name} on shift ${shift.index}`
-          );
-          let result = this.backtrack(assignment, domains);
-          if (result) return result;
-        } else {
-          console.log(
-            `Forward check failed for staffer ${staffer.name} on shift ${shift.index}`
-          );
+          this.backtrack(assignment, domains);
         }
 
         assignment[shift.index].pop();
         delete this.assignedShifts[staffer.name];
-        console.log(
-          `Backtracked: Removed staffer ${staffer.name} from shift ${shift.index}`
-        );
-        console.log(`Restored assignment:`, JSON.stringify(assignment));
-        domains = JSON.parse(JSON.stringify(domainCopy)); // Restore domains after backtracking
-        console.log(
-          `Restored domains after backtracking:`,
-          JSON.stringify(this.getDomainNames(domains))
-        );
-      } else {
-        console.log(
-          `Staffer ${staffer.name} is not consistent with shift ${shift.index}, skipping.`
-        );
+        domains = JSON.parse(JSON.stringify(domainCopy));
       }
     }
 
-    console.log(
-      `No valid assignment found for shift ${shift.index}, returning null.`
-    );
     return null;
   }
 
@@ -139,32 +116,25 @@ class CSP {
       (shift) => assignment[shift.index] && assignment[shift.index].length >= 1
     );
   }
+
   allStaffersAssigned(assignment) {
     let assignedStaffers = new Set();
 
-    // Gather all staffers from the assignment
     for (let shiftIndex in assignment) {
       for (let staffer of assignment[shiftIndex]) {
-        assignedStaffers.add(staffer.name); // Add unique staffer names
+        assignedStaffers.add(staffer.name);
       }
     }
 
-    // Check if all staffers are assigned
     return this.staffers.every((staffer) => assignedStaffers.has(staffer.name));
   }
 
   orderDomainValues(shiftIndex, assignment) {
-    console.log(
-      `Ordering domain values for shift ${shiftIndex} using Least Constraining Value (LCV) heuristic.`
-    );
-
     let stafferConflicts = {};
 
-    // For each staffer in the domain of the current shift, count how many other shifts they are a valid option for.
     for (let staffer of this.domains[shiftIndex]) {
       let conflictCount = 0;
 
-      // Go through other shifts and count how many are impacted by this staffer's assignment
       for (let otherShift of this.shifts) {
         if (
           otherShift.index !== shiftIndex &&
@@ -177,86 +147,108 @@ class CSP {
       stafferConflicts[staffer.name] = conflictCount;
     }
 
-    // Sort staffers by those who impose the fewest constraints on remaining shifts
-    let orderedStaffers = this.domains[shiftIndex].sort(
+    return this.domains[shiftIndex].sort(
       (a, b) => stafferConflicts[a.name] - stafferConflicts[b.name]
     );
-
-    console.log(
-      `Ordered domain values for shift ${shiftIndex}:`,
-      orderedStaffers.map((staffer) => staffer.name)
-    );
-
-    return orderedStaffers;
   }
+
   calculateScore(assignment) {
     let totalScore = 0;
 
-    // Iterate over each shift in the assignment
     for (let shiftIndex in assignment) {
       let assignedStaffers = assignment[shiftIndex];
+      let isDoubleShift = assignedStaffers.length === 2;
 
-      // Calculate the score based on each staffer's preference for this shift
       for (let staffer of assignedStaffers) {
         let shift = this.shifts.find((shift) => shift.index == shiftIndex);
         let preferenceScore = staffer.getPreferenceScore(shift);
         totalScore += preferenceScore;
 
-        console.log(
-          `Shift ${shiftIndex}: Staffer ${staffer.name} assigned with preference score ${preferenceScore}`
-        );
+        if (staffer.wantsDoubleShift() && isDoubleShift) {
+          totalScore += 10;
+          // console.log(
+          //   `Staffer ${staffer.name} prefers double shift and is assigned to one. +10 bonus.`
+          // );
+        } else if (staffer.wantsSoloShift() && !isDoubleShift) {
+          totalScore += 0;
+        } else if (staffer.isIndifferent()) {
+          totalScore += 0;
+        }
       }
     }
 
-    console.log(`Total score for current assignment: ${totalScore}`);
     return totalScore;
   }
 
   forwardCheck(shiftIndex, domains, staffer) {
-    console.log(
-      `Performing forward check for staffer ${staffer.name} on shift ${shiftIndex}`
-    );
+    let conflictThreshold = 2;
+    let conflicts = 0;
+
     for (let otherShiftIndex in domains) {
       if (otherShiftIndex != shiftIndex) {
-        let newDomain = domains[otherShiftIndex].filter(
-          (s) => s.name !== staffer.name
-        );
-        if (newDomain.length === 0) {
-          console.log(
-            `Forward check failed: no valid domains left for shift ${otherShiftIndex} after removing ${staffer.name}`
+        if (domains[otherShiftIndex].length <= 3) {
+          // Only prune when the domain is small
+          let newDomain = domains[otherShiftIndex].filter(
+            (s) => s.name !== staffer.name
           );
-          return false; // No valid assignments left, backtrack
+
+          if (newDomain.length === 0) {
+            return false;
+          }
+
+          if (newDomain.length < domains[otherShiftIndex].length) {
+            conflicts++;
+          }
+
+          if (conflicts > conflictThreshold) {
+            return false;
+          }
+
+          domains[otherShiftIndex] = newDomain;
         }
-        domains[otherShiftIndex] = newDomain;
-        console.log(
-          `Updated domain for shift ${otherShiftIndex} after forward check:`,
-          JSON.stringify(domains[otherShiftIndex].map((s) => s.name))
-        );
       }
     }
-    return true; // Forward check passed
+
+    return true;
   }
 
+  // selectUnassignedShift(assignment) {
+  //   let unassignedShifts = this.shifts.filter(
+  //     (shift) =>
+  //       (this.phase === 1 &&
+  //         (!assignment[shift.index] || assignment[shift.index].length < 1)) ||
+  //       (this.phase === 2 && assignment[shift.index].length < 2)
+  //   );
+  //   let selectedShift = unassignedShifts.reduce((a, b) =>
+  //     this.domains[a.index].length < this.domains[b.index].length ? a : b
+  //   );
+  //   return selectedShift;
+  // }
   selectUnassignedShift(assignment) {
-    console.log(`Selecting unassigned shift using MRV heuristic.`);
-    let unassignedShifts = this.shifts.filter(
-      (shift) =>
-        (this.phase === 1 &&
-          (!assignment[shift.index] || assignment[shift.index].length < 1)) ||
-        (this.phase === 2 && assignment[shift.index].length < 2)
-    );
+    // Filter unassigned shifts based on the current phase
+    let unassignedShifts = this.shifts.filter((shift) => {
+      if (this.phase === 1) {
+        return !assignment[shift.index] || assignment[shift.index].length < 1;
+      } else if (this.phase === 2) {
+        return assignment[shift.index] && assignment[shift.index].length < 2;
+      }
+      return false;
+    });
+
+    if (unassignedShifts.length === 0) {
+      return null; // No unassigned shifts left
+    }
+
+    // Select the shift with the smallest domain size
     let selectedShift = unassignedShifts.reduce((a, b) =>
       this.domains[a.index].length < this.domains[b.index].length ? a : b
     );
+
     return selectedShift;
   }
 
   isConsistent(staffer, shiftIndex, assignment) {
-    console.log(
-      `Checking consistency for staffer ${staffer.name} on shift ${shiftIndex}`
-    );
     if (this.assignedShifts[staffer.name]) {
-      console.log(`Staffer ${staffer.name} already assigned to another shift.`);
       return false;
     }
     if (
@@ -264,7 +256,6 @@ class CSP {
       assignment[shiftIndex] &&
       assignment[shiftIndex].length >= 1
     ) {
-      console.log(`Shift ${shiftIndex} already has one staffer in Phase 1.`);
       return false;
     }
     if (
@@ -272,7 +263,6 @@ class CSP {
       assignment[shiftIndex] &&
       assignment[shiftIndex].length >= 2
     ) {
-      console.log(`Shift ${shiftIndex} already has 2 staffers in Phase 2.`);
       return false;
     }
     return true;

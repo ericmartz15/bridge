@@ -92,7 +92,7 @@
       // Function to fetch data from Supabase
       async function fetchResponses() {
         try {
-          console.log("Fetching responses...");
+          // console.log("Fetching responses...");
 
           const { data, error } = await supabase
             .from("preferences")
@@ -100,7 +100,7 @@
 
           if (error) throw error;
 
-          console.log("Fetched data:", data);
+          // console.log("Fetched data:", data);
           const modifiedResults = data.map((row) => {
             const shiftFields = [
               "monday_shift_9_12",
@@ -142,10 +142,10 @@
             const preferences = shiftFields.map(
               (shiftField) => row[shiftField]
             );
-            console.log(
-              `Preferences for ${row.fname} ${row.lname}:`,
-              preferences
-            );
+            // console.log(
+            //   `Preferences for ${row.fname} ${row.lname}:`,
+            //   preferences
+            // );
 
             return {
               fullName: `${row.fname} ${row.lname}`,
@@ -167,7 +167,7 @@
       // Initialize classes and run the scheduler
       async function initializeAndSchedule() {
         let data = await fetchResponses();
-        console.log("Data received:", data);
+        // console.log("Data received:", data);
 
         if (data) {
           // Select only the first 5 staffers from the fetched data
@@ -189,10 +189,10 @@
             shifts.push(new Shift(i));
           }
 
-          console.log("Staffers: ", staffers);
+          // console.log("Staffers: ", staffers);
           let scheduler = new CSP(staffers, shifts);
           let schedule = scheduler.solve();
-          console.log("Schedule:", schedule);
+          // console.log("Schedule:", schedule);
 
           // Update the calendar grid with the scheduled staffers
           for (let shiftIndex in schedule) {
