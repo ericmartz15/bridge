@@ -3,6 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <title>Shift Scheduler</title>
+    <style>
+      /* Style for the table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      td {
+        background-color: #f9f9f9;
+        min-height: 50px;
+      }
+
+      /* Make all cells uniform in size */
+      td,
+      th {
+        height: 50px;
+        width: 12.5%; /* 8 columns (7 days + time slot) */
+      }
+
+      /* Add grid lines */
+      td,
+      th {
+        box-sizing: border-box;
+      }
+
+      /* Style for the header row */
+      thead th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      /* Style for the message */
+      #message {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      /* Button style */
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
   </head>
   <body>
     <h1>Shift Scheduler</h1>
@@ -104,6 +170,7 @@
     <script src="shift.js"></script>
     <script src="csp.js"></script>
     <button id="scheduleButton">Initialize and Schedule</button>
+    <button id="saveButton" style="display: none">Save Schedule</button>
 
     <script type="module">
       import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -187,7 +254,36 @@
           );
         }
       }
+      document
+        .getElementById("saveButton")
+        .addEventListener("click", saveSchedule);
 
+      async function saveSchedule() {
+        const scheduleData = [];
+        const shiftCells = document.querySelectorAll("[data-shift]");
+
+        shiftCells.forEach((cell, index) => {
+          if (cell.textContent) {
+            scheduleData.push({
+              shift: index,
+              staffers: cell.textContent,
+            });
+          }
+        });
+
+        try {
+          const { data, error } = await supabase
+            .from("schedules")
+            .insert([{ schedule: scheduleData }]);
+
+          if (error) throw error;
+          console.log("Schedule saved:", data);
+          alert("Schedule saved successfully!");
+        } catch (error) {
+          console.error("Error saving schedule:", error);
+          alert("Failed to save the schedule.");
+        }
+      }
       // Initialize classes and run the scheduler
       async function initializeAndSchedule() {
         let data = await fetchResponses();
@@ -233,6 +329,7 @@
                   .join(", ");
               }
             }
+            document.getElementById("saveButton").style.display = "block";
             console.log("Scheduling completed");
           }
         }

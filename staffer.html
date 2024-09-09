@@ -7,9 +7,82 @@
     <style>
       body {
         font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f7f7f7;
       }
+
       h1 {
-        color: blue;
+        text-align: center;
+      }
+
+      /* Style the settings dropdown */
+      label,
+      select {
+        font-size: 16px;
+        margin-right: 10px;
+      }
+
+      /* Style for the message */
+      #message {
+        font-size: 16px;
+        color: red;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      /* Style for the table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #ffffff;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      thead th {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #cccccc;
+      }
+
+      tbody td {
+        border: 1px solid #cccccc;
+        text-align: center;
+        padding: 10px;
+        height: 80px; /* Ensures all cells are of the same height */
+      }
+
+      td {
+        font-size: 14px;
+      }
+
+      /* Hover effect for the table cells */
+      td:hover {
+        background-color: #f0f0f0;
+      }
+
+      /* Style buttons */
+      button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #saveButton {
+        display: none;
       }
     </style>
   </head>
@@ -23,5 +96,113 @@
       Go back to the main page
       <a href="../index.html">here.</a>
     </h1>
+
+    <!-- Schedule table -->
+    <h1>Weekly Schedule</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Time Slot</th>
+          <th>Sunday</th>
+          <th>Monday</th>
+          <th>Tuesday</th>
+          <th>Wednesday</th>
+          <th>Thursday</th>
+          <th>Friday</th>
+          <th>Saturday</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>9am to 12pm</td>
+          <td data-shift="0"></td>
+          <td data-shift="5"></td>
+          <td data-shift="10"></td>
+          <td data-shift="15"></td>
+          <td data-shift="20"></td>
+          <td data-shift="25"></td>
+          <td data-shift="30"></td>
+        </tr>
+        <tr>
+          <td>12pm to 3pm</td>
+          <td data-shift="1"></td>
+          <td data-shift="6"></td>
+          <td data-shift="11"></td>
+          <td data-shift="16"></td>
+          <td data-shift="21"></td>
+          <td data-shift="26"></td>
+          <td data-shift="31"></td>
+        </tr>
+        <tr>
+          <td>3pm to 6pm</td>
+          <td data-shift="2"></td>
+          <td data-shift="7"></td>
+          <td data-shift="12"></td>
+          <td data-shift="17"></td>
+          <td data-shift="22"></td>
+          <td data-shift="27"></td>
+          <td data-shift="32"></td>
+        </tr>
+        <tr>
+          <td>6pm to 9pm</td>
+          <td data-shift="3"></td>
+          <td data-shift="8"></td>
+          <td data-shift="13"></td>
+          <td data-shift="18"></td>
+          <td data-shift="23"></td>
+          <td data-shift="28"></td>
+          <td data-shift="33"></td>
+        </tr>
+        <tr>
+          <td>9pm to 12am</td>
+          <td data-shift="4"></td>
+          <td data-shift="9"></td>
+          <td data-shift="14"></td>
+          <td data-shift="19"></td>
+          <td data-shift="24"></td>
+          <td data-shift="29"></td>
+          <td data-shift="34"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Supabase integration -->
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+      const supabase = createClient(
+        "https://qlpnemwvmcskvybbgtad.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscG5lbXd2bWNza3Z5YmJndGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ3Mjc0NTIsImV4cCI6MjA0MDMwMzQ1Mn0.zcvOnnZF0lqsSCb_286byzVOqL9EyR75OZMDWoPWrAQ"
+      );
+
+      // Fetch and display schedule from Supabase
+      async function fetchSchedule() {
+        try {
+          const { data, error } = await supabase
+            .from("schedules")
+            .select("schedule");
+
+          if (error) throw error;
+
+          // Populate the table with the schedule data
+          if (data.length > 0 && data[0].schedule) {
+            const schedule = data[0].schedule;
+            schedule.forEach((shift) => {
+              const cell = document.querySelector(
+                `[data-shift="${shift.shift}"]`
+              );
+              if (cell) {
+                cell.textContent = shift.staffers;
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching schedule:", error);
+        }
+      }
+
+      // Fetch the schedule on page load
+      window.onload = fetchSchedule;
+    </script>
   </body>
 </html>
