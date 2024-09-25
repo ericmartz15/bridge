@@ -1,9 +1,30 @@
 class Staffer {
-  constructor(name, preferences, doubleStaff, floater) {
+  constructor(
+    name,
+    preferences,
+    doubleStaff,
+    floater,
+    email,
+    phone_number,
+    grad_year,
+    residence,
+    additional,
+    snacks,
+    concerns,
+    suggestions
+  ) {
     this.name = name;
     this.preferences = preferences;
     this.assignedShift = null;
     this.doubleStaff = doubleStaff;
+    this.email = email;
+    this.phone_number = phone_number;
+    this.grad_year = grad_year;
+    this.residence = residence;
+    this.additional = additional;
+    this.snacks = snacks;
+    this.concerns = concerns;
+    this.suggestions = suggestions;
     // Interpret the floater field as a boolean: true if "floater", false if "fullstaff"
     this.floater = floater === "floater";
     // console.log("Created Staffer:", this.name, this.preferences);

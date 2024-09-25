@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/back-arrow.css" />
     <title>Shift Preferences Form</title>
     <style>
       table {
@@ -18,10 +19,50 @@
       th {
         background-color: #f2f2f2;
       }
+      /* Flexbox to align the header with the back arrow and title */
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px;
+        gap: 20px; /* Space between back arrow and title */
+      }
+
+      .back-arrow {
+        text-decoration: none;
+        font-size: 18px;
+        color: #007bff;
+      }
+
+      .back-arrow:hover {
+        color: #0056b3;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        flex-grow: 1; /* Make title take up available space */
+        text-align: center;
+      }
+
+      /* Make sure the layout is responsive */
+      @media (max-width: 600px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        h1 {
+          text-align: left;
+        }
+      }
     </style>
   </head>
   <body>
-    <h1>Shift Preferences Form</h1>
+    <header>
+      <a href="staffer.html" class="back-arrow">&#9664; Back to Staffer Home</a>
+      <h1>Shift Preferences Form</h1>
+    </header>
+
     <!-- <form
       action="https://web.stanford.edu/group/bridge/staffonly/submit-form"
       method="post"
@@ -48,9 +89,9 @@
         <p>
           Please check here to indicate that you have read our
           <a
-            href="https://docs.google.com/document/d/1SKiwIi2UCRYt6w8xpD_m5a5gzBh7jxjdYVdPS4EYWAI/copy?usp=sharing"
+            href="https://drive.google.com/drive/folders/1hhrE2m4MIIE6YJZs0eXyhGXf0KWswoPR"
           >
-            Spring 2023 staffer agreement.
+            Fall 2024 staffer agreement.
           </a>
         </p>
         <input
@@ -918,14 +959,9 @@
       <!-- Submit button -->
       <input type="submit" value="Submit Preferences" />
     </form>
-    <!-- <script src="https://unpkg.com/@supabase/supabase-js"></script> -->
+
     <script type="module" src="upload.js"></script>
 
-    <!-- <script>
-      document
-        .getElementById("myForm")
-        .addEventListener("submit", handleSubmit);
-    </script> -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const fullstaffRadio = document.getElementById("fullstaff");

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="../css/back-arrow.css" />
+    <meta charset="UTF-8" />
+    <title>Staff Availability</title>
+    <style>
+      /* Basic styles for the availability table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      td {
+        background-color: #f9f9f9;
+        min-height: 50px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Style for additional details */
+      .additional-details {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: #f9f9f9;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px;
+        gap: 20px; /* Space between back arrow and title */
+      }
+
+      .back-arrow {
+        text-decoration: none;
+        font-size: 18px;
+        color: #007bff;
+      }
+
+      .back-arrow:hover {
+        color: #0056b3;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        flex-grow: 1; /* Make title take up available space */
+        text-align: center;
+      }
+
+      /* Make sure the layout is responsive */
+      @media (max-width: 600px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        h1 {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="allstaff.html" class="back-arrow"
+        >&#9664; Back to All-Staff Home</a
+      >
+      <h1>Staff Availability</h1>
+    </header>
+
+    <div id="staffList"></div>
+
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+      const supabase = createClient(
+        "https://qlpnemwvmcskvybbgtad.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscG5lbXd2bWNza3Z5YmJndGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ3Mjc0NTIsImV4cCI6MjA0MDMwMzQ1Mn0.zcvOnnZF0lqsSCb_286byzVOqL9EyR75OZMDWoPWrAQ"
+      );
+
+      async function fetchResponses() {
+        try {
+          const { data, error } = await supabase
+            .from("fall24_preferences")
+            .select("*");
+          if (error) throw error;
+
+          const shiftFields = [
+            "monday_shift_9_12",
+            "monday_shift_12_3",
+            "monday_shift_3_6",
+            "monday_shift_6_9",
+            "monday_shift_9_12_pm",
+            "tuesday_shift_9_12",
+            "tuesday_shift_12_3",
+            "tuesday_shift_3_6",
+            "tuesday_shift_6_9",
+            "tuesday_shift_9_12_pm",
+            "wednesday_shift_9_12",
+            "wednesday_shift_12_3",
+            "wednesday_shift_3_6",
+            "wednesday_shift_6_9",
+            "wednesday_shift_9_12_pm",
+            "thursday_shift_9_12",
+            "thursday_shift_12_3",
+            "thursday_shift_3_6",
+            "thursday_shift_6_9",
+            "thursday_shift_9_12_pm",
+            "friday_shift_9_12",
+            "friday_shift_12_3",
+            "friday_shift_3_6",
+            "friday_shift_6_9",
+            "friday_shift_9_12_pm",
+            "saturday_shift_9_12",
+            "saturday_shift_12_3",
+            "saturday_shift_3_6",
+            "saturday_shift_6_9",
+            "saturday_shift_9_12_pm",
+            "sunday_shift_9_12",
+            "sunday_shift_12_3",
+            "sunday_shift_3_6",
+            "sunday_shift_6_9",
+            "sunday_shift_9_12_pm",
+          ];
+
+          return data.map((row) => {
+            const preferences = shiftFields.map(
+              (shiftField) => row[shiftField]
+            );
+            return {
+              fullName: `${row.fname} ${row.lname}`,
+              preferences,
+              doubleStaffedSelection: row.double_shift,
+              floater: row.floater,
+              email: row.email,
+              phone_number: row.phone,
+              grad_year: row.grad,
+              residence: row.residence,
+              additional: row.additional,
+              snacks: row.snacks,
+              concerns: row.concerns,
+              suggestions: row.suggestions,
+            };
+          });
+        } catch (error) {
+          console.error(
+            "There has been a problem with your fetch operation:",
+            error
+          );
+        }
+      }
+
+      function createAvailabilityGrid(preferences) {
+        const table = document.createElement("table");
+        table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Time Slot</th>
+        <th>Sunday</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>9am to 12pm</td>
+        <td>${preferences[30]}</td> 
+        <td>${preferences[0]}</td>  
+        <td>${preferences[5]}</td>  
+        <td>${preferences[10]}</td> 
+        <td>${preferences[15]}</td> 
+        <td>${preferences[20]}</td> 
+        <td>${preferences[25]}</td> 
+      </tr>
+      <tr>
+        <td>12pm to 3pm</td>
+        <td>${preferences[31]}</td> 
+        <td>${preferences[1]}</td>  
+        <td>${preferences[6]}</td>  
+        <td>${preferences[11]}</td> 
+        <td>${preferences[16]}</td> 
+        <td>${preferences[21]}</td> 
+        <td>${preferences[26]}</td> 
+      </tr>
+      <tr>
+        <td>3pm to 6pm</td>
+        <td>${preferences[32]}</td> 
+        <td>${preferences[2]}</td>  
+        <td>${preferences[7]}</td>  
+        <td>${preferences[12]}</td> 
+        <td>${preferences[17]}</td> 
+        <td>${preferences[22]}</td> 
+        <td>${preferences[27]}</td> 
+      </tr>
+      <tr>
+        <td>6pm to 9pm</td>
+        <td>${preferences[33]}</td> 
+        <td>${preferences[3]}</td>  
+        <td>${preferences[8]}</td>  
+        <td>${preferences[13]}</td> 
+        <td>${preferences[18]}</td> 
+        <td>${preferences[23]}</td> 
+        <td>${preferences[28]}</td> 
+      </tr>
+      <tr>
+        <td>9pm to 12am</td>
+        <td>${preferences[34]}</td> 
+        <td>${preferences[4]}</td>  
+        <td>${preferences[9]}</td>  
+        <td>${preferences[14]}</td> 
+        <td>${preferences[19]}</td>
+        <td>${preferences[24]}</td> 
+        <td>${preferences[29]}</td> 
+      </tr>
+    </tbody>
+  `;
+        return table;
+      }
+
+      // function createAdditionalDetails(staffer) {
+      //   const detailsDiv = document.createElement("div");
+      //   detailsDiv.classList.add("additional-details");
+
+      //   const doubleStaffed = document.createElement("p");
+      //   doubleStaffed.textContent = `Double Staffed Selection: ${
+      //     staffer.doubleStaffedSelection ? "Yes" : "No"
+      //   }`;
+      //   detailsDiv.appendChild(doubleStaffed);
+
+      //   const floater = document.createElement("p");
+      //   floater.textContent = `Floater: ${
+      //     staffer.floater === "floater" ? "Yes" : "No"
+      //   }`;
+      //   detailsDiv.appendChild(floater);
+
+      //   return detailsDiv;
+      // }
+      function createAdditionalDetails(staffer) {
+        const detailsDiv = document.createElement("div");
+        detailsDiv.classList.add("additional-details");
+
+        const doubleStaffed = document.createElement("p");
+        doubleStaffed.textContent = `Double Staffed Selection: ${
+          staffer.doubleStaffedSelection ? "Yes" : "No"
+        }`;
+        detailsDiv.appendChild(doubleStaffed);
+
+        const floater = document.createElement("p");
+        floater.textContent = `Floater: ${
+          staffer.floater === "floater" ? "Yes" : "No"
+        }`;
+        detailsDiv.appendChild(floater);
+
+        const email = document.createElement("p");
+        email.textContent = `Email: ${staffer.email}`;
+        detailsDiv.appendChild(email);
+
+        const phone = document.createElement("p");
+        phone.textContent = `Phone Number: ${staffer.phone_number}`;
+        detailsDiv.appendChild(phone);
+
+        const gradYear = document.createElement("p");
+        gradYear.textContent = `Graduation Year: ${staffer.grad_year}`;
+        detailsDiv.appendChild(gradYear);
+
+        const residence = document.createElement("p");
+        residence.textContent = `Residence: ${staffer.residence}`;
+        detailsDiv.appendChild(residence);
+
+        const additional = document.createElement("p");
+        additional.textContent = `Additional Comments: ${
+          staffer.additional || "N/A"
+        }`;
+        detailsDiv.appendChild(additional);
+
+        const snacks = document.createElement("p");
+        snacks.textContent = `Favorite Snacks: ${staffer.snacks || "N/A"}`;
+        detailsDiv.appendChild(snacks);
+
+        const concerns = document.createElement("p");
+        concerns.textContent = `Concerns: ${staffer.concerns || "N/A"}`;
+        detailsDiv.appendChild(concerns);
+
+        const suggestions = document.createElement("p");
+        suggestions.textContent = `Suggestions: ${
+          staffer.suggestions || "N/A"
+        }`;
+        detailsDiv.appendChild(suggestions);
+
+        return detailsDiv;
+      }
+
+      async function displayStaffers() {
+        const staffListContainer = document.getElementById("staffList");
+        const staffers = await fetchResponses();
+
+        if (staffers) {
+          staffers.forEach((staffer) => {
+            const stafferDiv = document.createElement("div");
+            stafferDiv.classList.add("staffer");
+
+            const stafferName = document.createElement("h2");
+            stafferName.textContent = staffer.fullName;
+            stafferDiv.appendChild(stafferName);
+
+            const availabilityGrid = createAvailabilityGrid(
+              staffer.preferences
+            );
+
+            availabilityGrid.classList.add("hidden");
+            stafferDiv.appendChild(availabilityGrid);
+
+            const additionalDetails = createAdditionalDetails(staffer);
+            additionalDetails.classList.add("hidden");
+            stafferDiv.appendChild(additionalDetails);
+
+            stafferName.addEventListener("click", () => {
+              const isHidden = availabilityGrid.classList.contains("hidden");
+              availabilityGrid.classList.toggle("hidden", !isHidden);
+              additionalDetails.classList.toggle("hidden", !isHidden);
+            });
+
+            staffListContainer.appendChild(stafferDiv);
+          });
+        }
+      }
+
+      displayStaffers();
+    </script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="../css/back-arrow.css" />
+    <meta charset="UTF-8" />
+    <title>Staff Availability</title>
+    <style>
+      /* General styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7f9;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      /* Styling for the header */
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #007bff;
+        color: white;
+      }
+
+      .back-arrow {
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        font-weight: bold;
+        transition: color 0.3s;
+      }
+
+      .back-arrow:hover {
+        color: #cce0ff;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        text-align: center;
+        flex-grow: 1;
+      }
+
+      /* Basic table styles */
+      table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: white;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+      }
+
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      td {
+        background-color: #f9f9f9;
+      }
+
+      td:hover {
+        background-color: #e0f0ff;
+      }
+
+      /* Hidden class to toggle elements */
+      .hidden {
+        display: none;
+      }
+
+      /* Styles for the additional details section */
+      .additional-details {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        background-color: #f9f9f9;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .additional-details p {
+        margin: 8px 0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Hover effects for staff names */
+      h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        color: #007bff;
+        transition: color 0.3s;
+      }
+
+      h2:hover {
+        color: #0056b3;
+      }
+
+      /* Responsive styling for mobile devices */
+      @media (max-width: 600px) {
+        header {
+          flex-direction: column;
+          align-items: center;
+          padding: 15px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        table th,
+        table td {
+          font-size: 12px;
+        }
+
+        h2 {
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="allstaff.html" class="back-arrow"
+        >&#9664; Back to All-Staff Home</a
+      >
+      <h1>Staff Availability</h1>
+    </header>
+
+    <div id="staffList"></div>
+
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+      const supabase = createClient(
+        "https://qlpnemwvmcskvybbgtad.supabase.co",
+        "your-key"
+      );
+
+      async function fetchResponses() {
+        try {
+          const { data, error } = await supabase
+            .from("fall24_preferences")
+            .select("*");
+          if (error) throw error;
+
+          const shiftFields = [
+            "monday_shift_9_12",
+            "monday_shift_12_3",
+            "monday_shift_3_6",
+            "monday_shift_6_9",
+            "monday_shift_9_12_pm",
+            "tuesday_shift_9_12",
+            "tuesday_shift_12_3",
+            "tuesday_shift_3_6",
+            "tuesday_shift_6_9",
+            "tuesday_shift_9_12_pm",
+            "wednesday_shift_9_12",
+            "wednesday_shift_12_3",
+            "wednesday_shift_3_6",
+            "wednesday_shift_6_9",
+            "wednesday_shift_9_12_pm",
+            "thursday_shift_9_12",
+            "thursday_shift_12_3",
+            "thursday_shift_3_6",
+            "thursday_shift_6_9",
+            "thursday_shift_9_12_pm",
+            "friday_shift_9_12",
+            "friday_shift_12_3",
+            "friday_shift_3_6",
+            "friday_shift_6_9",
+            "friday_shift_9_12_pm",
+            "saturday_shift_9_12",
+            "saturday_shift_12_3",
+            "saturday_shift_3_6",
+            "saturday_shift_6_9",
+            "saturday_shift_9_12_pm",
+            "sunday_shift_9_12",
+            "sunday_shift_12_3",
+            "sunday_shift_3_6",
+            "sunday_shift_6_9",
+            "sunday_shift_9_12_pm",
+          ];
+
+          return data.map((row) => {
+            const preferences = shiftFields.map(
+              (shiftField) => row[shiftField]
+            );
+            return {
+              fullName: `${row.fname} ${row.lname}`,
+              preferences,
+              doubleStaffedSelection: row.double_shift,
+              floater: row.floater,
+              email: row.email,
+              phone_number: row.phone,
+              grad_year: row.grad,
+              residence: row.residence,
+              additional: row.additional,
+              snacks: row.snacks,
+              concerns: row.concerns,
+              suggestions: row.suggestions,
+            };
+          });
+        } catch (error) {
+          console.error(
+            "There has been a problem with your fetch operation:",
+            error
+          );
+        }
+      }
+
+      function createAvailabilityGrid(preferences) {
+        const table = document.createElement("table");
+        table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Time Slot</th>
+        <th>Sunday</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>9am to 12pm</td>
+        <td>${preferences[30]}</td> 
+        <td>${preferences[0]}</td>  
+        <td>${preferences[5]}</td>  
+        <td>${preferences[10]}</td> 
+        <td>${preferences[15]}</td> 
+        <td>${preferences[20]}</td> 
+        <td>${preferences[25]}</td> 
+      </tr>
+      <tr>
+        <td>12pm to 3pm</td>
+        <td>${preferences[31]}</td> 
+        <td>${preferences[1]}</td>  
+        <td>${preferences[6]}</td>  
+        <td>${preferences[11]}</td> 
+        <td>${preferences[16]}</td> 
+        <td>${preferences[21]}</td> 
+        <td>${preferences[26]}</td> 
+      </tr>
+      <tr>
+        <td>3pm to 6pm</td>
+        <td>${preferences[32]}</td> 
+        <td>${preferences[2]}</td>  
+        <td>${preferences[7]}</td>  
+        <td>${preferences[12]}</td> 
+        <td>${preferences[17]}</td> 
+        <td>${preferences[22]}</td> 
+        <td>${preferences[27]}</td> 
+      </tr>
+      <tr>
+        <td>6pm to 9pm</td>
+        <td>${preferences[33]}</td> 
+        <td>${preferences[3]}</td>  
+        <td>${preferences[8]}</td>  
+        <td>${preferences[13]}</td> 
+        <td>${preferences[18]}</td> 
+        <td>${preferences[23]}</td> 
+        <td>${preferences[28]}</td> 
+      </tr>
+      <tr>
+        <td>9pm to 12am</td>
+        <td>${preferences[34]}</td> 
+        <td>${preferences[4]}</td>  
+        <td>${preferences[9]}</td>  
+        <td>${preferences[14]}</td> 
+        <td>${preferences[19]}</td>
+        <td>${preferences[24]}</td> 
+        <td>${preferences[29]}</td> 
+      </tr>
+    </tbody>
+  `;
+        return table;
+      }
+
+      function createAdditionalDetails(staffer) {
+        const detailsDiv = document.createElement("div");
+        detailsDiv.classList.add("additional-details");
+
+        const detailsContent = `
+        <p><strong>Email:</strong> ${staffer.email}</p>
+        <p><strong>Phone:</strong> ${staffer.phone_number}</p>
+        <p><strong>Grad Year:</strong> ${staffer.grad_year}</p>
+        <p><strong>Residence:</strong> ${staffer.residence}</p>
+        <p><strong>Double Staffed Selection:</strong> ${staffer.doubleStaffedSelection}</p>
+        <p><strong>Floater:</strong> ${staffer.floater}</p>
+        <p><strong>Additional Info:</strong> ${staffer.additional}</p>
+        <p><strong>Favorite Snacks:</strong> ${staffer.snacks}</p>
+        <p><strong>Concerns:</strong> ${staffer.concerns}</p>
+        <p><strong>Suggestions:</strong> ${staffer.suggestions}</p>
+        `;
+
+        detailsDiv.innerHTML = detailsContent;
+        return detailsDiv;
+      }
+
+      function createStafferElement(staffer) {
+        const containerDiv = document.createElement("div");
+
+        const stafferNameHeader = document.createElement("h2");
+        stafferNameHeader.textContent = staffer.fullName;
+
+        const availabilityGrid = createAvailabilityGrid(staffer.preferences);
+        availabilityGrid.classList.add("hidden");
+
+        const additionalDetails = createAdditionalDetails(staffer);
+        additionalDetails.classList.add("hidden");
+
+        stafferNameHeader.addEventListener("click", () => {
+          availabilityGrid.classList.toggle("hidden");
+          additionalDetails.classList.toggle("hidden");
+        });
+
+        containerDiv.appendChild(stafferNameHeader);
+        containerDiv.appendChild(availabilityGrid);
+        containerDiv.appendChild(additionalDetails);
+
+        return containerDiv;
+      }
+
+      async function renderStaffList() {
+        const staffListContainer = document.getElementById("staffList");
+        const staffers = await fetchResponses();
+        staffers.forEach((staffer) => {
+          const stafferElement = createStafferElement(staffer);
+          staffListContainer.appendChild(stafferElement);
+        });
+      }
+
+      renderStaffList();
+    </script>
+  </body>
+</html>

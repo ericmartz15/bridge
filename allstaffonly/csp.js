@@ -8,7 +8,7 @@ class CSP {
     this.solution = null;
     this.bestSolution = null;
     this.bestScore = -Infinity;
-    this.assignedShifts = {};
+    this.assignedShifts = new Set();
     this.backtrackCallCount = 0;
     this.phase = 1; // Start with phase 1
     this.solutionCount = 0;
@@ -96,15 +96,19 @@ class CSP {
         if (!assignment[shift.index]) {
           assignment[shift.index] = [];
         }
+        // console.log(`Assigning ${staffer.name} to shift ${shift.index}`);
         assignment[shift.index].push(staffer);
-        this.assignedShifts[staffer.name] = shift.index;
+        this.assignedShifts.add(staffer.name);
 
         if (this.forwardCheck(shift.index, domains, staffer)) {
           this.backtrack(assignment, domains);
         }
+        // console.log(`Unassigning ${staffer.name} from shift ${shift.index}`);
 
         assignment[shift.index].pop();
-        delete this.assignedShifts[staffer.name];
+        this.assignedShifts.delete(staffer.name);
+        // console.log("Assigned shifts after unassignment:", this.assignedShifts);
+
         domains = JSON.parse(JSON.stringify(domainCopy));
       }
     }
@@ -249,7 +253,7 @@ class CSP {
   // }
 
   isConsistent(staffer, shiftIndex, assignment) {
-    if (this.assignedShifts[staffer.name]) {
+    if (this.assignedShifts.has(staffer.name)) {
       return false;
     }
     if (

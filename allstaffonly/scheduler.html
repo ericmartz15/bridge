@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="../css/back-arrow.css" />
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shift Scheduler</title>
     <style>
       /* Style for the table */
@@ -27,6 +29,11 @@
       td {
         background-color: #f9f9f9;
         min-height: 50px;
+        cursor: pointer;
+      }
+
+      td:hover {
+        background-color: #e0e0e0;
       }
 
       /* Make all cells uniform in size */
@@ -68,10 +75,52 @@
       button:hover {
         background-color: #0056b3;
       }
+
+      /* Flexbox to align the header with the back arrow and title */
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px;
+        gap: 20px; /* Space between back arrow and title */
+      }
+
+      .back-arrow {
+        text-decoration: none;
+        font-size: 18px;
+        color: #007bff;
+      }
+
+      .back-arrow:hover {
+        color: #0056b3;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        flex-grow: 1; /* Make title take up available space */
+        text-align: center;
+      }
+
+      /* Make sure the layout is responsive */
+      @media (max-width: 600px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        h1 {
+          text-align: left;
+        }
+      }
     </style>
   </head>
   <body>
-    <h1>Shift Scheduler</h1>
+    <header>
+      <a href="allstaff.html" class="back-arrow"
+        >&#9664; Back to All-Staff Home</a
+      >
+      <h1>Shift Scheduler</h1>
+    </header>
 
     <!-- Settings -->
     <label for="settings">Settings:</label>
@@ -180,80 +229,126 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscG5lbXd2bWNza3Z5YmJndGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ3Mjc0NTIsImV4cCI6MjA0MDMwMzQ1Mn0.zcvOnnZF0lqsSCb_286byzVOqL9EyR75OZMDWoPWrAQ"
       );
 
-      // Function to fetch data from Supabase
+      // Fetch responses from Supabase
       async function fetchResponses() {
         try {
-          // console.log("Fetching responses...");
-
           const { data, error } = await supabase
-            .from("preferences")
+            .from("fall24_preferences")
             .select("*");
 
           if (error) throw error;
 
-          // console.log("Fetched data:", data);
           const modifiedResults = data.map((row) => {
+            // const shiftFields = [
+            //   "monday_shift_9_12",
+            //   "monday_shift_12_3",
+            //   "monday_shift_3_6",
+            //   "monday_shift_6_9",
+            //   "monday_shift_9_12_pm",
+            //   "tuesday_shift_9_12",
+            //   "tuesday_shift_12_3",
+            //   "tuesday_shift_3_6",
+            //   "tuesday_shift_6_9",
+            //   "tuesday_shift_9_12_pm",
+            //   "wednesday_shift_9_12",
+            //   "wednesday_shift_12_3",
+            //   "wednesday_shift_3_6",
+            //   "wednesday_shift_6_9",
+            //   "wednesday_shift_9_12_pm",
+            //   "thursday_shift_9_12",
+            //   "thursday_shift_12_3",
+            //   "thursday_shift_3_6",
+            //   "thursday_shift_6_9",
+            //   "thursday_shift_9_12_pm",
+            //   "friday_shift_9_12",
+            //   "friday_shift_12_3",
+            //   "friday_shift_3_6",
+            //   "friday_shift_6_9",
+            //   "friday_shift_9_12_pm",
+            //   "saturday_shift_9_12",
+            //   "saturday_shift_12_3",
+            //   "saturday_shift_3_6",
+            //   "saturday_shift_6_9",
+            //   "saturday_shift_9_12_pm",
+            //   "sunday_shift_9_12",
+            //   "sunday_shift_12_3",
+            //   "sunday_shift_3_6",
+            //   "sunday_shift_6_9",
+            //   "sunday_shift_9_12_pm",
+            // ];
             const shiftFields = [
-              "monday_shift_9_12",
-              "monday_shift_12_3",
-              "monday_shift_3_6",
-              "monday_shift_6_9",
-              "monday_shift_9_12_pm",
-              "tuesday_shift_9_12",
-              "tuesday_shift_12_3",
-              "tuesday_shift_3_6",
-              "tuesday_shift_6_9",
-              "tuesday_shift_9_12_pm",
-              "wednesday_shift_9_12",
-              "wednesday_shift_12_3",
-              "wednesday_shift_3_6",
-              "wednesday_shift_6_9",
-              "wednesday_shift_9_12_pm",
-              "thursday_shift_9_12",
-              "thursday_shift_12_3",
-              "thursday_shift_3_6",
-              "thursday_shift_6_9",
-              "thursday_shift_9_12_pm",
-              "friday_shift_9_12",
-              "friday_shift_12_3",
-              "friday_shift_3_6",
-              "friday_shift_6_9",
-              "friday_shift_9_12_pm",
-              "saturday_shift_9_12",
-              "saturday_shift_12_3",
-              "saturday_shift_3_6",
-              "saturday_shift_6_9",
-              "saturday_shift_9_12_pm",
+              // Time Slot 1: 9am to 12pm
               "sunday_shift_9_12",
+              "monday_shift_9_12",
+              "tuesday_shift_9_12",
+              "wednesday_shift_9_12",
+              "thursday_shift_9_12",
+              "friday_shift_9_12",
+              "saturday_shift_9_12",
+
+              // Time Slot 2: 12pm to 3pm
               "sunday_shift_12_3",
+              "monday_shift_12_3",
+              "tuesday_shift_12_3",
+              "wednesday_shift_12_3",
+              "thursday_shift_12_3",
+              "friday_shift_12_3",
+              "saturday_shift_12_3",
+
+              // Time Slot 3: 3pm to 6pm
               "sunday_shift_3_6",
+              "monday_shift_3_6",
+              "tuesday_shift_3_6",
+              "wednesday_shift_3_6",
+              "thursday_shift_3_6",
+              "friday_shift_3_6",
+              "saturday_shift_3_6",
+
+              // Time Slot 4: 6pm to 9pm
               "sunday_shift_6_9",
+              "monday_shift_6_9",
+              "tuesday_shift_6_9",
+              "wednesday_shift_6_9",
+              "thursday_shift_6_9",
+              "friday_shift_6_9",
+              "saturday_shift_6_9",
+
+              // Time Slot 5: 9pm to 12am
               "sunday_shift_9_12_pm",
+              "monday_shift_9_12_pm",
+              "tuesday_shift_9_12_pm",
+              "wednesday_shift_9_12_pm",
+              "thursday_shift_9_12_pm",
+              "friday_shift_9_12_pm",
+              "saturday_shift_9_12_pm",
             ];
+
             const preferences = shiftFields.map(
               (shiftField) => row[shiftField]
             );
-            // console.log(
-            //   `Preferences for ${row.fname} ${row.lname}:`,
-            //   preferences
-            // );
 
             return {
               fullName: `${row.fname} ${row.lname}`,
-              preferences: preferences, // Array of all shift preferences
+              preferences,
               doubleStaffedSelection: row.double_shift,
               floater: row.floater,
+              email: row.email,
+              phone_number: row.phone,
+              grad_year: row.grad,
+              residence: row.residence,
+              additional: row.additional,
+              snacks: row.snacks,
+              concerns: row.concerns,
+              suggestions: row.suggestions,
             };
           });
 
           return modifiedResults;
         } catch (error) {
-          console.error(
-            "There has been a problem with your fetch operation:",
-            error
-          );
+          console.error("Error fetching responses:", error);
         }
       }
+
       document
         .getElementById("saveButton")
         .addEventListener("click", saveSchedule);
@@ -273,53 +368,52 @@
 
         try {
           const { data, error } = await supabase
-            .from("schedules")
+            .from("fall24_schedule")
             .insert([{ schedule: scheduleData }]);
 
           if (error) throw error;
-          console.log("Schedule saved:", data);
           alert("Schedule saved successfully!");
         } catch (error) {
-          console.error("Error saving schedule:", error);
           alert("Failed to save the schedule.");
         }
       }
-      // Initialize classes and run the scheduler
+
+      // Initialize scheduler
       async function initializeAndSchedule() {
         let data = await fetchResponses();
-        // console.log("Data received:", data);
 
         if (data) {
           let settings = parseInt(document.getElementById("settings").value);
-          // Select only the first 5 staffers from the fetched data
-          let staffers = data
-            // .slice(0, 5)
-            .map(
-              (response) =>
-                new Staffer(
-                  response.fullName,
-                  response.preferences,
-                  response.doubleStaffedSelection,
-                  response.floater
-                )
-            );
+          let staffers = data.map(
+            (response) =>
+              new Staffer(
+                response.fullName,
+                response.preferences,
+                response.doubleStaffedSelection,
+                response.floater,
+                response.email,
+                response.phone_number,
+                response.grad_year,
+                response.residence,
+                response.additional,
+                response.snacks,
+                response.concerns,
+                response.suggestions
+              )
+          );
 
-          // Create only the first 5 shifts (for Monday)
           let shifts = [];
           for (let i = 0; i < 35; i++) {
             shifts.push(new Shift(i));
           }
 
-          // console.log("Staffers: ", staffers);
           let scheduler = new CSP(staffers, shifts, settings);
           let schedule = scheduler.solve();
-          // console.log("Schedule:", schedule);
 
           if (schedule === null) {
-            document.getElementById("message").style.display = "block"; // Show message if no schedule found
+            document.getElementById("message").style.display = "block";
           } else {
-            document.getElementById("message").style.display = "none"; // Hide message
-            // Update the calendar grid with the scheduled staffers
+            document.getElementById("message").style.display = "none";
             for (let shiftIndex in schedule) {
               let staffers = schedule[shiftIndex];
               let cell = document.querySelector(`[data-shift="${shiftIndex}"]`);
@@ -330,7 +424,6 @@
               }
             }
             document.getElementById("saveButton").style.display = "block";
-            console.log("Scheduling completed");
           }
         }
       }
@@ -338,6 +431,19 @@
       document
         .getElementById("scheduleButton")
         .addEventListener("click", initializeAndSchedule);
+
+      // Make shifts editable
+      document.querySelectorAll("[data-shift]").forEach((cell) => {
+        cell.addEventListener("click", function () {
+          const newStaffers = prompt(
+            "Enter staff names separated by commas:",
+            cell.textContent
+          );
+          if (newStaffers !== null) {
+            cell.textContent = newStaffers.trim();
+          }
+        });
+      });
     </script>
   </body>
 </html>

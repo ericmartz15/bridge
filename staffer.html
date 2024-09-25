@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="../css/back-arrow.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Staffer Page</title>
@@ -9,10 +10,6 @@
         font-family: Arial, sans-serif;
         margin: 20px;
         background-color: #f7f7f7;
-      }
-
-      h1 {
-        text-align: center;
       }
 
       /* Style the settings dropdown */
@@ -84,21 +81,57 @@
       #saveButton {
         display: none;
       }
+      /* Flexbox to align the header with the back arrow and title */
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px;
+        gap: 20px; /* Space between back arrow and title */
+      }
+
+      .back-arrow {
+        text-decoration: none;
+        font-size: 18px;
+        color: #007bff;
+      }
+
+      .back-arrow:hover {
+        color: #0056b3;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        flex-grow: 1; /* Make title take up available space */
+        text-align: center;
+      }
+
+      /* Make sure the layout is responsive */
+      @media (max-width: 600px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        h1 {
+          text-align: left;
+        }
+      }
     </style>
   </head>
   <body>
-    <h1>Welcome To The Staffer Home Page</h1>
+    <header>
+      <a href="../index.html" class="back-arrow">&#9664; Back to Home Page</a>
+      <h1>Welcome To The Staffer Home Page</h1>
+    </header>
+
     <h1>
       Fill out your shift preferences
       <a href="preferences.html">here.</a>
     </h1>
-    <h1>
-      Go back to the main page
-      <a href="../index.html">here.</a>
-    </h1>
 
     <!-- Schedule table -->
-    <h1>Weekly Schedule</h1>
+    <h1>Fall Quarter Schedule</h1>
     <table>
       <thead>
         <tr>
@@ -179,23 +212,48 @@
       async function fetchSchedule() {
         try {
           const { data, error } = await supabase
-            .from("schedules")
-            .select("schedule");
+            .from("fall24_schedule")
+            .select("schedule, created_at")
+            .order("created_at", { ascending: false });
 
-          if (error) throw error;
+          if (error) throw new Error(`Supabase fetch error: ${error.message}`);
 
-          // Populate the table with the schedule data
-          if (data.length > 0 && data[0].schedule) {
-            const schedule = data[0].schedule;
-            schedule.forEach((shift) => {
-              const cell = document.querySelector(
-                `[data-shift="${shift.shift}"]`
+          if (!data || data.length === 0) {
+            console.warn("No schedule data found.");
+            return;
+          }
+
+          const latestSchedule = data[0].schedule; // Get the latest schedule entry
+
+          if (!latestSchedule || !Array.isArray(latestSchedule)) {
+            console.error("Invalid or empty schedule data.");
+            return;
+          }
+
+          // Define a matrix to map the schedule in row-major order for a 7-day week
+          const matrix = [
+            [30, 0, 5, 10, 15, 20, 25], // 9am to 12pm row
+            [31, 1, 6, 11, 16, 21, 26], // 12pm to 3pm row
+            [32, 2, 7, 12, 17, 22, 27], // 3pm to 6pm row
+            [33, 3, 8, 13, 18, 23, 28], // 6pm to 9pm row
+            [34, 4, 9, 14, 19, 24, 29], // 9pm to 12am row
+          ];
+
+          // Loop through the matrix to map shifts to the correct cells
+          matrix.forEach((row) => {
+            row.forEach((shiftId) => {
+              const shiftData = latestSchedule.find(
+                (shift) => shift.shift === shiftId
               );
+              const cell = document.querySelector(`[data-shift="${shiftId}"]`);
+
               if (cell) {
-                cell.textContent = shift.staffers;
+                cell.textContent = shiftData
+                  ? shiftData.staffers || "No staff"
+                  : "No staff";
               }
             });
-          }
+          });
         } catch (error) {
           console.error("Error fetching schedule:", error);
         }
