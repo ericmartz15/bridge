@@ -122,16 +122,55 @@
   <body>
     <header>
       <a href="../index.html" class="back-arrow">&#9664; Back to Home Page</a>
-      <h1>Welcome To The Staffer Home Page</h1>
+      <h1
+        style="
+          font-size: 2.3em;
+          font-weight: bold;
+          color: #333;
+          text-align: center;
+          margin: 30px 0;
+        "
+      >
+        Welcome To The Staffer Home Page
+      </h1>
     </header>
 
-    <h1>
-      Fill out your shift preferences
-      <a href="preferences.html">here.</a>
-    </h1>
+    <div style="text-align: center; margin: 40px 0">
+      <!-- Large Heading -->
+      <h1
+        style="
+          font-size: 1.8em;
+          font-weight: bold;
+          color: #0066cc;
+          margin-bottom: 20px;
+        "
+      >
+        Looking to fill out your shift preferences?
+      </h1>
+
+      <!-- Centered Access Form Button -->
+      <a
+        href="preferences.html"
+        style="
+          display: inline-block;
+          background-color: #0066cc;
+          color: white;
+          padding: 15px 40px;
+          font-size: 1.5em;
+          font-weight: bold;
+          text-decoration: none;
+          border-radius: 8px;
+          transition: background-color 0.3s;
+        "
+        onmouseover="this.style.backgroundColor='#0055aa';"
+        onmouseout="this.style.backgroundColor='#0066cc';"
+      >
+        Access the Form Here!
+      </a>
+    </div>
 
     <!-- Schedule table -->
-    <h1>Fall Quarter Schedule</h1>
+    <h1>Spring Quarter Schedule</h1>
     <table>
       <thead>
         <tr>
@@ -149,52 +188,87 @@
         <tr>
           <td>9am to 12pm</td>
           <td data-shift="0"></td>
+          <!-- Sunday -->
+          <td data-shift="1"></td>
+          <!-- Monday -->
+          <td data-shift="2"></td>
+          <!-- Tuesday -->
+          <td data-shift="3"></td>
+          <!-- Wednesday -->
+          <td data-shift="4"></td>
+          <!-- Thursday -->
           <td data-shift="5"></td>
-          <td data-shift="10"></td>
-          <td data-shift="15"></td>
-          <td data-shift="20"></td>
-          <td data-shift="25"></td>
-          <td data-shift="30"></td>
+          <!-- Friday -->
+          <td data-shift="6"></td>
+          <!-- Saturday -->
         </tr>
         <tr>
           <td>12pm to 3pm</td>
-          <td data-shift="1"></td>
-          <td data-shift="6"></td>
+          <td data-shift="7"></td>
+          <!-- Sunday -->
+          <td data-shift="8"></td>
+          <!-- Monday -->
+          <td data-shift="9"></td>
+          <!-- Tuesday -->
+          <td data-shift="10"></td>
+          <!-- Wednesday -->
           <td data-shift="11"></td>
-          <td data-shift="16"></td>
-          <td data-shift="21"></td>
-          <td data-shift="26"></td>
-          <td data-shift="31"></td>
+          <!-- Thursday -->
+          <td data-shift="12"></td>
+          <!-- Friday -->
+          <td data-shift="13"></td>
+          <!-- Saturday -->
         </tr>
         <tr>
           <td>3pm to 6pm</td>
-          <td data-shift="2"></td>
-          <td data-shift="7"></td>
-          <td data-shift="12"></td>
+          <td data-shift="14"></td>
+          <!-- Sunday -->
+          <td data-shift="15"></td>
+          <!-- Monday -->
+          <td data-shift="16"></td>
+          <!-- Tuesday -->
           <td data-shift="17"></td>
-          <td data-shift="22"></td>
-          <td data-shift="27"></td>
-          <td data-shift="32"></td>
+          <!-- Wednesday -->
+          <td data-shift="18"></td>
+          <!-- Thursday -->
+          <td data-shift="19"></td>
+          <!-- Friday -->
+          <td data-shift="20"></td>
+          <!-- Saturday -->
         </tr>
         <tr>
           <td>6pm to 9pm</td>
-          <td data-shift="3"></td>
-          <td data-shift="8"></td>
-          <td data-shift="13"></td>
-          <td data-shift="18"></td>
+          <td data-shift="21"></td>
+          <!-- Sunday -->
+          <td data-shift="22"></td>
+          <!-- Monday -->
           <td data-shift="23"></td>
-          <td data-shift="28"></td>
-          <td data-shift="33"></td>
+          <!-- Tuesday -->
+          <td data-shift="24"></td>
+          <!-- Wednesday -->
+          <td data-shift="25"></td>
+          <!-- Thursday -->
+          <td data-shift="26"></td>
+          <!-- Friday -->
+          <td data-shift="27"></td>
+          <!-- Saturday -->
         </tr>
         <tr>
           <td>9pm to 12am</td>
-          <td data-shift="4"></td>
-          <td data-shift="9"></td>
-          <td data-shift="14"></td>
-          <td data-shift="19"></td>
-          <td data-shift="24"></td>
+          <td data-shift="28"></td>
+          <!-- Sunday -->
           <td data-shift="29"></td>
+          <!-- Monday -->
+          <td data-shift="30"></td>
+          <!-- Tuesday -->
+          <td data-shift="31"></td>
+          <!-- Wednesday -->
+          <td data-shift="32"></td>
+          <!-- Thursday -->
+          <td data-shift="33"></td>
+          <!-- Friday -->
           <td data-shift="34"></td>
+          <!-- Saturday -->
         </tr>
       </tbody>
     </table>
@@ -204,15 +278,16 @@
       import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
       const supabase = createClient(
-        "https://qlpnemwvmcskvybbgtad.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscG5lbXd2bWNza3Z5YmJndGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ3Mjc0NTIsImV4cCI6MjA0MDMwMzQ1Mn0.zcvOnnZF0lqsSCb_286byzVOqL9EyR75OZMDWoPWrAQ"
+        // UPDATE HERE EACH QUARTER
+        "https://uwbudrkqyjxcnlpkezdt.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3YnVkcmtxeWp4Y25scGtlemR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NjI2MjksImV4cCI6MjA1OTEzODYyOX0.8-3ubutM6TH54iw2UBLRGSbCECZG4dzjoRgarBzLLBw"
       );
 
       // Fetch and display schedule from Supabase
       async function fetchSchedule() {
         try {
           const { data, error } = await supabase
-            .from("fall24_schedule")
+            .from("spr25_schedule")
             .select("schedule, created_at")
             .order("created_at", { ascending: false });
 
