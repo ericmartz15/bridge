@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thank You - The Bridge Peer Counseling Center</title>
+
+    <!-- Google Fonts matching homepage -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Roboto:400,300,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      /* Main container */
+      .container {
+        background: white;
+        padding: 60px 50px;
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Decorative background element */
+      .container::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          rgba(0, 123, 255, 0.05) 0%,
+          rgba(0, 86, 179, 0.05) 100%
+        );
+        border-radius: 50%;
+        z-index: -1;
+      }
+
+      /* Success icon */
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px auto;
+        animation: bounceIn 0.6s ease-out;
+      }
+
+      .success-icon::after {
+        content: "✓";
+        color: white;
+        font-size: 2.5em;
+        font-weight: bold;
+      }
+
+      /* Main heading */
+      .main-title {
+        font-family: "Roboto Slab", serif;
+        font-size: 2.2em;
+        font-weight: 700;
+        color: #007bff;
+        margin-bottom: 25px;
+        line-height: 1.3;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      /* Message text */
+      .message {
+        font-size: 1.2em;
+        color: #6c757d;
+        margin-bottom: 40px;
+        line-height: 1.6;
+        font-weight: 400;
+        animation: fadeInUp 1s ease-out;
+      }
+
+      /* Return button */
+      .return-button {
+        display: inline-block;
+        text-decoration: none;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 18px 40px;
+        border-radius: 50px;
+        font-size: 1.1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 1.2s ease-out;
+      }
+
+      .return-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .return-button:hover::before {
+        left: 100%;
+      }
+
+      .return-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 123, 255, 0.4);
+        color: white;
+        text-decoration: none;
+      }
+
+      .return-button:active {
+        transform: translateY(-1px);
+      }
+
+      /* Additional message */
+      .sub-message {
+        margin-top: 30px;
+        font-size: 0.9em;
+        color: #868e96;
+        font-style: italic;
+        animation: fadeIn 1.5s ease-out;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 40px 30px;
+          margin: 15px;
+        }
+
+        .main-title {
+          font-size: 1.8em;
+        }
+
+        .message {
+          font-size: 1.1em;
+        }
+
+        .return-button {
+          padding: 15px 30px;
+          font-size: 1em;
+        }
+
+        .success-icon {
+          width: 70px;
+          height: 70px;
+        }
+
+        .success-icon::after {
+          font-size: 2em;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        .main-title {
+          font-size: 1.6em;
+        }
+
+        .message {
+          font-size: 1em;
+        }
+      }
+
+      /* Animations */
+      @keyframes bounceIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.3);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+        70% {
+          transform: scale(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Accessibility improvements */
+      .return-button:focus {
+        outline: 3px solid #80bdff;
+        outline-offset: 2px;
+      }
+
+      /* Add subtle floating animation to container */
+      .container {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Success Icon -->
+      <div class="success-icon"></div>
+
+      <!-- Main Content -->
+      <h1 class="main-title">
+        Thank you for submitting your shift preferences!
+      </h1>
+
+      <p class="message">
+        Your submission has been received successfully. We appreciate you taking
+        the time to provide your availability preferences.
+      </p>
+
+      <!-- Return Button -->
+      <a href="../index.html" class="return-button"
+        >Return to Bridge Home Page</a
+      >
+    </div>
+  </body>
+</html>

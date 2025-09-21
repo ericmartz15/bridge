@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shift Preferences Form - The Bridge Peer Counseling Center</title>
+
+    <!-- Google Fonts matching homepage -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Roboto:400,300,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8f9fa;
+      }
+
+      /* Header styling matching homepage */
+      .header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 20px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .back-arrow {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-self: start;
+      }
+
+      .back-arrow:hover {
+        color: #cce0ff;
+        transform: translateX(-3px);
+      }
+
+      .header-title {
+        font-family: "Roboto Slab", serif;
+        font-size: 2.2em;
+        font-weight: 700;
+        text-align: center;
+        justify-self: center;
+      }
+
+      /* Main container */
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      /* Form styling */
+      form {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      /* Fieldset styling */
+      fieldset {
+        border: none;
+        padding: 30px 40px;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      fieldset:last-of-type {
+        border-bottom: none;
+      }
+
+      legend {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.8em;
+        font-weight: 600;
+        color: #007bff;
+        background: white;
+        padding: 0 20px;
+        margin-bottom: 20px;
+        border: 2px solid #007bff;
+        border-radius: 25px;
+        text-align: center;
+      }
+
+      /* Form elements */
+      label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        font-family: "Roboto", Arial, sans-serif;
+      }
+
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="tel"]:focus,
+      textarea:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+      }
+
+      /* Radio button styling */
+      input[type="radio"] {
+        margin-right: 8px;
+        margin-bottom: 12px;
+        transform: scale(1.2);
+        accent-color: #007bff;
+      }
+
+      /* Checkbox styling */
+      input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+        accent-color: #007bff;
+      }
+
+      /* File input styling */
+      input[type="file"] {
+        padding: 10px;
+        border: 2px dashed #007bff;
+        border-radius: 8px;
+        background: #f8f9ff;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      input[type="file"]:hover {
+        background: #e3f2fd;
+        border-color: #0056b3;
+      }
+
+      /* Paragraph styling */
+      p {
+        margin-bottom: 15px;
+        color: #6c757d;
+        line-height: 1.6;
+      }
+
+      /* Link styling */
+      a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      a:hover {
+        color: #0056b3;
+        text-decoration: underline;
+      }
+
+      /* Day section headers */
+      h4 {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.4em;
+        color: #007bff;
+        margin: 30px 0 15px 0;
+        padding: 10px 0;
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+      }
+
+      /* Table styling */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      table thead th {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 15px 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      table tbody td {
+        padding: 15px 10px;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        background: #fafbfc;
+        transition: all 0.3s ease;
+      }
+
+      table tbody td:first-child {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        text-align: left;
+        padding-left: 20px;
+      }
+
+      table tbody tr:hover td {
+        background-color: #e3f2fd;
+      }
+
+      /* Radio buttons in tables */
+      table input[type="radio"] {
+        margin: 0;
+        transform: scale(1.3);
+      }
+
+      /* Submit button */
+      .submit-container {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      }
+
+      input[type="submit"] {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 18px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+      }
+
+      input[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .header-content {
+          grid-template-columns: 1fr;
+          text-align: center;
+          gap: 15px;
+        }
+
+        .header-title {
+          font-size: 1.8em;
+        }
+
+        .back-arrow {
+          justify-self: center;
+        }
+
+        .container {
+          padding: 20px 10px;
+        }
+
+        fieldset {
+          padding: 20px;
+        }
+
+        legend {
+          font-size: 1.4em;
+          padding: 0 15px;
+        }
+
+        table {
+          font-size: 12px;
+        }
+
+        table thead th,
+        table tbody td {
+          padding: 8px 5px;
+        }
+
+        table tbody td:first-child {
+          padding-left: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        table {
+          font-size: 10px;
+        }
+
+        table thead th,
+        table tbody td {
+          padding: 6px 3px;
+        }
+
+        legend {
+          font-size: 1.2em;
+        }
+      }
+
+      /* Animation */
+      form {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Special styling for radio button labels */
+      fieldset label {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      fieldset label:hover {
+        color: #007bff;
+      }
+
+      /* Required field indicator */
+      input:required {
+        border-left: 4px solid #007bff;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="staffer.html" class="back-arrow">
+          <span>&#9664;</span> Back to Staffer Home
+        </a>
+        <h1 class="header-title">Shift Preferences Form</h1>
+        <div></div>
+        <!-- Spacer for grid balance -->
+      </div>
+    </header>
+
+    <div class="container">
+      <form id="myForm" enctype="multipart/form-data">
+        <fieldset>
+          <legend>Contact Information</legend>
+          <label for="fname">First name:</label>
+          <input type="text" id="fname" name="fname" required />
+
+          <label for="lname">Last name:</label>
+          <input type="text" id="lname" name="lname" required />
+
+          <label for="email">Stanford Email:</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="phone">Phone Number:</label>
+          <input type="tel" id="phone" name="phone" required />
+
+          <label for="grad">Graduation Year:</label>
+          <input type="text" id="grad" name="grad" required />
+
+          <label for="residence">Stanford Residence:</label>
+          <input type="text" id="residence" name="residence" required />
+        </fieldset>
+
+        <fieldset>
+          <legend>Staffer Agreement</legend>
+          <p>
+            Please check here to indicate that you have read our
+            <a
+              href="https://docs.google.com/document/d/1qoVS6bg5iqfdgVuvcnYF2tu4jVcsfyn1qTuOInODY6c/edit?usp=sharing"
+            >
+              Autumn 2025 staffer agreement.
+            </a>
+          </p>
+          <label>
+            <input
+              type="checkbox"
+              id="agreement"
+              name="agreement"
+              value="Agreement"
+              required
+            />
+            I have read the staffer agreement in its entirety and understand its
+            contents.
+          </label>
+
+          <p>
+            Then, please make a copy of this agreement, fill in your signature,
+            and upload it here as a PDF.
+          </p>
+          <label for="pdfUpload">Choose a PDF file:</label>
+          <input
+            type="file"
+            id="pdfUpload"
+            name="pdfUpload"
+            accept=".pdf"
+            required
+          />
+        </fieldset>
+
+        <fieldset>
+          <legend>Full Staffer or Floater?</legend>
+          <p>
+            Please indicate whether you would like to be a full time staffer,
+            committing to taking one 3-hour shift per week including finals
+            week, or if you would like to be a floater, committing to cover
+            three 3-hour shifts over the course of the quarter.
+          </p>
+          <label>
+            <input
+              type="radio"
+              id="fullstaff"
+              name="floater"
+              value="fullstaff"
+              required
+            />
+            I would like to full staff!
+          </label>
+          <label>
+            <input
+              type="radio"
+              id="floater"
+              name="floater"
+              value="floater"
+              required
+            />
+            I would like to float!
+          </label>
+        </fieldset>
+
+        <fieldset id="shift-preferences">
+          <legend>Shift Preferences</legend>
+          <p>
+            Please fill out each day of the week with whether you can make it or
+            not. As a reminder, all shifts are in-person. If you indicated you
+            would like to be a floater, you may skip this section.
+          </p>
+
+          <!-- Monday -->
+          <h4>Monday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input type="radio" name="monday_shift_9_12" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="monday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_9_12" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input type="radio" name="monday_shift_12_3" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="monday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_12_3" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input type="radio" name="monday_shift_3_6" value="nooo" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_3_6" value="pref_no" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_3_6" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="monday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_6_9" value="pref_no" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_6_9" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="monday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="monday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="monday_shift_9_12_pm" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="monday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Tuesday -->
+          <h4>Tuesday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input type="radio" name="tuesday_shift_9_12" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_9_12" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input type="radio" name="tuesday_shift_12_3" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_12_3" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input type="radio" name="tuesday_shift_3_6" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_3_6"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_3_6" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="tuesday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_6_9"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_6_9" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="tuesday_shift_9_12_pm" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="tuesday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Wednesday -->
+          <h4>Wednesday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="wednesday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_12_3"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="wednesday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_12_3"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input type="radio" name="wednesday_shift_3_6" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_3_6"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="wednesday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_3_6"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="wednesday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_6_9"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="wednesday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_6_9"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12_pm"
+                    value="ok"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="wednesday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Thursday -->
+          <h4>Thursday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input type="radio" name="thursday_shift_9_12" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="thursday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_9_12"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input type="radio" name="thursday_shift_12_3" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="thursday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_12_3"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input type="radio" name="thursday_shift_3_6" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_3_6"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="thursday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="thursday_shift_3_6" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="thursday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_6_9"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="thursday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="thursday_shift_6_9" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_9_12_pm"
+                    value="ok"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="thursday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Friday -->
+          <h4>Friday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input type="radio" name="friday_shift_9_12" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="friday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_9_12" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input type="radio" name="friday_shift_12_3" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="friday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_12_3" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input type="radio" name="friday_shift_3_6" value="nooo" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_3_6" value="pref_no" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_3_6" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="friday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_6_9" value="pref_no" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_6_9" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="friday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="friday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="friday_shift_9_12_pm" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="friday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Saturday -->
+          <h4>Saturday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input type="radio" name="saturday_shift_9_12" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="saturday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_9_12"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input type="radio" name="saturday_shift_12_3" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="saturday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_12_3"
+                    value="great"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_3_6"
+                    value="nooo"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_3_6"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="saturday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="saturday_shift_3_6" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="saturday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_6_9"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="saturday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="saturday_shift_6_9" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_9_12_pm"
+                    value="ok"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="saturday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Sunday -->
+          <h4>Sunday</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>NOOO</th>
+                <th>Pref No</th>
+                <th>OK</th>
+                <th>Great</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9AM - 12PM</td>
+                <td>
+                  <input type="radio" name="sunday_shift_9_12" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="sunday_shift_9_12"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_9_12" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_9_12" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>12PM - 3PM</td>
+                <td>
+                  <input type="radio" name="sunday_shift_12_3" value="nooo" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="sunday_shift_12_3"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_12_3" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_12_3" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>3PM - 6PM</td>
+                <td>
+                  <input type="radio" name="sunday_shift_3_6" value="nooo" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_3_6" value="pref_no" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_3_6" value="ok" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_3_6" value="great" />
+                </td>
+              </tr>
+              <tr>
+                <td>6PM - 9PM</td>
+                <td>
+                  <input type="radio" name="sunday_shift_6_9" value="nooo" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_6_9" value="pref_no" />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_6_9" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="sunday_shift_6_9"
+                    value="great"
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>9PM - 12AM</td>
+                <td>
+                  <input
+                    type="radio"
+                    name="sunday_shift_9_12_pm"
+                    value="nooo"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="sunday_shift_9_12_pm"
+                    value="pref_no"
+                  />
+                </td>
+                <td>
+                  <input type="radio" name="sunday_shift_9_12_pm" value="ok" />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="sunday_shift_9_12_pm"
+                    value="great"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+
+        <fieldset>
+          <legend>Double Shift?</legend>
+          <p>
+            Would you like to share a shift with another Bridge staffer (subject
+            to staffer availability)? We encourage this for new staffers.
+          </p>
+          <label>
+            <input type="radio" name="double_shift" value="solo" />
+            Definitely riding solo!
+          </label>
+          <label>
+            <input type="radio" name="double_shift" value="either" />
+            I can live with or without you...
+          </label>
+          <label>
+            <input type="radio" name="double_shift" value="share" />
+            I would love a fellow staffer!
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Additional Information</legend>
+          <label for="additional">
+            Is there anything you want to tell us about your availability that
+            this form is not allowing you to indicate? If you indicated a
+            severely limited schedule above (i.e., only marking GREAT for one
+            time and NOOO for all other times), please provide a brief
+            explanation here.
+          </label>
+          <textarea
+            id="additional"
+            name="additional"
+            rows="5"
+            cols="50"
+          ></textarea>
+        </fieldset>
+
+        <fieldset>
+          <legend>Before you go...</legend>
+
+          <label for="snacks">Any snack suggestions?</label>
+          <textarea id="snacks" name="snacks" rows="3" cols="50"></textarea>
+
+          <label for="concerns">
+            Do you have any questions, comments, or concerns for us?
+          </label>
+          <textarea id="concerns" name="concerns" rows="5" cols="50"></textarea>
+
+          <label for="suggestions">
+            Do you have any suggestions for how to make this form better?
+          </label>
+          <textarea
+            id="suggestions"
+            name="suggestions"
+            rows="4"
+            cols="50"
+          ></textarea>
+        </fieldset>
+
+        <div class="submit-container">
+          <input type="submit" value="Submit Preferences" />
+        </div>
+      </form>
+    </div>
+
+    <script type="module" src="upload.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const fullstaffRadio = document.getElementById("fullstaff");
+        const floaterRadio = document.getElementById("floater");
+        const shiftPreferences = document.getElementById("shift-preferences");
+
+        function toggleShiftPreferences() {
+          const shiftInputs = shiftPreferences.querySelectorAll("input");
+          if (fullstaffRadio.checked) {
+            shiftInputs.forEach((input) =>
+              input.setAttribute("required", "required")
+            );
+          } else {
+            shiftInputs.forEach((input) => input.removeAttribute("required"));
+          }
+        }
+
+        toggleShiftPreferences();
+
+        fullstaffRadio.addEventListener("change", toggleShiftPreferences);
+        floaterRadio.addEventListener("change", toggleShiftPreferences);
+      });
+    </script>
+  </body>
+</html>

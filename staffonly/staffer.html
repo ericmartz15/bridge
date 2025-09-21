@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staffer Portal - The Bridge Peer Counseling Center</title>
+    
+    <!-- Google Fonts matching homepage -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Roboto:400,300,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    
+    <style>
+      /* Reset and base styles matching homepage */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Roboto', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8f9fa;
+      }
+
+      /* Header styling matching homepage */
+      .header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 20px 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .back-arrow {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-self: start;
+      }
+
+      .back-arrow:hover {
+        color: #cce0ff;
+        transform: translateX(-3px);
+      }
+
+      .header-title {
+        font-family: 'Roboto Slab', serif;
+        font-size: 2.2em;
+        font-weight: 700;
+        text-align: center;
+        justify-self: center;
+      }
+
+      /* Main container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* CTA Section */
+      .cta-section {
+        background: white;
+        margin: 40px 0;
+        padding: 60px 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        text-align: center;
+      }
+
+      .cta-title {
+        font-family: 'Roboto Slab', serif;
+        font-size: 2em;
+        color: #007bff;
+        margin-bottom: 30px;
+        font-weight: 600;
+      }
+
+      .cta-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 18px 40px;
+        font-size: 1.3em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        color: white;
+        text-decoration: none;
+      }
+
+      /* Schedule section */
+      .schedule-section {
+        background: white;
+        margin: 40px 0;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      }
+
+      .schedule-title {
+        font-family: 'Roboto Slab', serif;
+        font-size: 2.2em;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+      }
+
+      /* Table styling */
+      .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 20px;
+      }
+
+      .schedule-table thead th {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        font-weight: 600;
+        text-align: center;
+        padding: 18px 12px;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+      }
+
+      .schedule-table tbody td {
+        background: #fafbfc;
+        border: 1px solid #e9ecef;
+        text-align: center;
+        padding: 20px 12px;
+        height: 80px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        vertical-align: middle;
+      }
+
+      .schedule-table tbody td:first-child {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        border-right: 2px solid #007bff;
+      }
+
+      .schedule-table tbody tr:hover td {
+        background-color: #e3f2fd;
+        transform: scale(1.01);
+      }
+
+      .schedule-table tbody td:hover {
+        background-color: #bbdefb !important;
+        cursor: pointer;
+        box-shadow: inset 0 0 10px rgba(0, 123, 255, 0.2);
+      }
+
+      /* Message styling */
+      #message {
+        background: #fee;
+        color: #c62828;
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 20px 0;
+        border-left: 4px solid #c62828;
+        font-weight: 500;
+        display: none;
+      }
+
+      /* Button styling */
+      .action-buttons {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      button {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+      }
+
+      #saveButton {
+        display: none;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      }
+
+      #saveButton:hover {
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+
+        .header-title {
+          font-size: 1.8em;
+          margin: 0;
+        }
+
+        .back-arrow {
+          align-self: flex-start;
+        }
+
+        .cta-section {
+          padding: 40px 20px;
+        }
+
+        .cta-title {
+          font-size: 1.6em;
+        }
+
+        .cta-button {
+          padding: 15px 30px;
+          font-size: 1.1em;
+        }
+
+        .schedule-section {
+          padding: 20px;
+        }
+
+        .schedule-title {
+          font-size: 1.8em;
+        }
+
+        .schedule-table {
+          font-size: 12px;
+        }
+
+        .schedule-table thead th,
+        .schedule-table tbody td {
+          padding: 12px 6px;
+        }
+
+        .container {
+          padding: 0 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .schedule-table thead th,
+        .schedule-table tbody td {
+          padding: 8px 4px;
+          font-size: 11px;
+        }
+
+        .schedule-table tbody td {
+          height: 60px;
+        }
+      }
+
+      /* Loading state */
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      /* Animation for smooth loading */
+      .schedule-section {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="../index.html" class="back-arrow">
+          <span>&#9664;</span> Back to Home
+        </a>
+        <h1 class="header-title">Staffer Portal</h1>
+        <div></div> <!-- Spacer for flexbox balance -->
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Call to Action Section -->
+      <section class="cta-section">
+        <h2 class="cta-title">Ready to Submit Your Shift Preferences?</h2>
+        <a href="preferences.html" class="cta-button">
+          Access Preference Form
+        </a>
+      </section>
+
+      <!-- Message Display -->
+      <div id="message"></div>
+
+      <!-- Schedule Section -->
+      <section class="schedule-section">
+        <h2 class="schedule-title" id="schedule-title">Current Quarter Schedule</h2>
+        
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Time Slot</th>
+              <th>Sunday</th>
+              <th>Monday</th>
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>
+              <th>Friday</th>
+              <th>Saturday</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>9am to 12pm</td>
+              <td data-shift="30">Loading...</td>
+              <td data-shift="0">Loading...</td>
+              <td data-shift="5">Loading...</td>
+              <td data-shift="10">Loading...</td>
+              <td data-shift="15">Loading...</td>
+              <td data-shift="20">Loading...</td>
+              <td data-shift="25">Loading...</td>
+            </tr>
+            <tr>
+              <td>12pm to 3pm</td>
+              <td data-shift="31">Loading...</td>
+              <td data-shift="1">Loading...</td>
+              <td data-shift="6">Loading...</td>
+              <td data-shift="11">Loading...</td>
+              <td data-shift="16">Loading...</td>
+              <td data-shift="21">Loading...</td>
+              <td data-shift="26">Loading...</td>
+            </tr>
+            <tr>
+              <td>3pm to 6pm</td>
+              <td data-shift="32">Loading...</td>
+              <td data-shift="2">Loading...</td>
+              <td data-shift="7">Loading...</td>
+              <td data-shift="12">Loading...</td>
+              <td data-shift="17">Loading...</td>
+              <td data-shift="22">Loading...</td>
+              <td data-shift="27">Loading...</td>
+            </tr>
+            <tr>
+              <td>6pm to 9pm</td>
+              <td data-shift="33">Loading...</td>
+              <td data-shift="3">Loading...</td>
+              <td data-shift="8">Loading...</td>
+              <td data-shift="13">Loading...</td>
+              <td data-shift="18">Loading...</td>
+              <td data-shift="23">Loading...</td>
+              <td data-shift="28">Loading...</td>
+            </tr>
+            <tr>
+              <td>9pm to 12am</td>
+              <td data-shift="34">Loading...</td>
+              <td data-shift="4">Loading...</td>
+              <td data-shift="9">Loading...</td>
+              <td data-shift="14">Loading...</td>
+              <td data-shift="19">Loading...</td>
+              <td data-shift="24">Loading...</td>
+              <td data-shift="29">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- Supabase integration (unchanged functionality) -->
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+      const supabase = createClient(
+        "https://bhzwyokvygnxnqdocjhy.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoend5b2t2eWdueG5xZG9jamh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTQ1MDYsImV4cCI6MjA3MzczMDUwNn0.vSyiiRvQNV9DOcZRUHH31YkNqC5KZHgo0IqZ0DBcpUE"
+      );
+
+      function getCurrentQuarter() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+
+        if (month >= 1 && month <= 3) return `winter${year}`;
+        if (month >= 4 && month <= 6) return `spring${year}`;
+        if (month >= 7 && month < 9) return `summer${year}`;
+        return `fall${year}`;
+      }
+
+      function getQuarterDisplayName() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+
+        if (month >= 1 && month <= 3) return `Winter ${year}`;
+        if (month >= 4 && month <= 6) return `Spring ${year}`;
+        if (month >= 7 && month < 9) return `Summer ${year}`;
+        return `Fall ${year}`;
+      }
+
+      async function fetchSchedule() {
+        try {
+          const currentQuarter = getCurrentQuarter();
+          console.log(`Fetching schedule for: ${currentQuarter}`);
+
+          const titleElement = document.getElementById("schedule-title");
+          if (titleElement) {
+            titleElement.textContent = `${getQuarterDisplayName()} Quarter Schedule`;
+          }
+
+          const { data, error } = await supabase
+            .from("shift_schedule")
+            .select("*")
+            .eq("quarter", currentQuarter)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          if (error) throw new Error(`Supabase fetch error: ${error.message}`);
+
+          if (!data || data.length === 0) {
+            console.warn(`No schedule data found for ${currentQuarter}.`);
+            for (let i = 0; i <= 34; i++) {
+              const cell = document.querySelector(`[data-shift="${i}"]`);
+              if (cell) {
+                cell.textContent = "No staff";
+              }
+            }
+            return;
+          }
+
+          const latestSchedule = data[0];
+
+          const shiftMapping = {
+            0: latestSchedule.monday_shift_9_12,
+            1: latestSchedule.monday_shift_12_3,
+            2: latestSchedule.monday_shift_3_6,
+            3: latestSchedule.monday_shift_6_9,
+            4: latestSchedule.monday_shift_9_12_pm,
+            5: latestSchedule.tuesday_shift_9_12,
+            6: latestSchedule.tuesday_shift_12_3,
+            7: latestSchedule.tuesday_shift_3_6,
+            8: latestSchedule.tuesday_shift_6_9,
+            9: latestSchedule.tuesday_shift_9_12_pm,
+            10: latestSchedule.wednesday_shift_9_12,
+            11: latestSchedule.wednesday_shift_12_3,
+            12: latestSchedule.wednesday_shift_3_6,
+            13: latestSchedule.wednesday_shift_6_9,
+            14: latestSchedule.wednesday_shift_9_12_pm,
+            15: latestSchedule.thursday_shift_9_12,
+            16: latestSchedule.thursday_shift_12_3,
+            17: latestSchedule.thursday_shift_3_6,
+            18: latestSchedule.thursday_shift_6_9,
+            19: latestSchedule.thursday_shift_9_12_pm,
+            20: latestSchedule.friday_shift_9_12,
+            21: latestSchedule.friday_shift_12_3,
+            22: latestSchedule.friday_shift_3_6,
+            23: latestSchedule.friday_shift_6_9,
+            24: latestSchedule.friday_shift_9_12_pm,
+            25: latestSchedule.saturday_shift_9_12,
+            26: latestSchedule.saturday_shift_12_3,
+            27: latestSchedule.saturday_shift_3_6,
+            28: latestSchedule.saturday_shift_6_9,
+            29: latestSchedule.saturday_shift_9_12_pm,
+            30: latestSchedule.sunday_shift_9_12,
+            31: latestSchedule.sunday_shift_12_3,
+            32: latestSchedule.sunday_shift_3_6,
+            33: latestSchedule.sunday_shift_6_9,
+            34: latestSchedule.sunday_shift_9_12_pm,
+          };
+
+          for (let shiftId = 0; shiftId <= 34; shiftId++) {
+            const cell = document.querySelector(`[data-shift="${shiftId}"]`);
+            const staffers = shiftMapping[shiftId];
+
+            if (cell) {
+              cell.textContent = staffers || "No staff";
+            }
+          }
+
+          console.log(`Schedule loaded successfully for ${currentQuarter}`);
+        } catch (error) {
+          console.error("Error fetching schedule:", error);
+        }
+      }
+
+      window.onload = fetchSchedule;
+    </script>
+  </body>
+</html>

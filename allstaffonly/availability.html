@@ -1,165 +1,503 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="../css/back-arrow.css" />
     <meta charset="UTF-8" />
-    <title>Staff Availability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Availability - The Bridge Peer Counseling Center</title>
+
+    <!-- Google Fonts matching homepage -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Roboto:400,300,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+
     <style>
-      /* General styles */
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f7f9;
+      /* Reset and base styles */
+      * {
         margin: 0;
-        padding: 10px; /* Padding for the body content */
-        color: #333;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      /* Styling for the header */
-      header {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; /* Keep it aligned to the left */
-        padding: 20px;
-        margin-left: -10px; /* Negative margin to pull it back */
-        margin-right: -10px; /* Optional: adjust right margin if needed */
-        background-color: #007bff;
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8f9fa;
+      }
+
+      /* Header styling matching homepage */
+      .header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: white;
-        gap: 20px; /* Space between back arrow and title */
+        padding: 20px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        align-items: center;
+        gap: 20px;
       }
 
       .back-arrow {
+        color: white;
         text-decoration: none;
-        font-size: 18px;
-        color: white; /* Updated color to white */
-        font-weight: bold;
-        transition: color 0.3s;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-self: start;
       }
 
       .back-arrow:hover {
         color: #cce0ff;
+        transform: translateX(-3px);
       }
 
-      h1 {
+      .header-title {
+        font-family: "Roboto Slab", serif;
+        font-size: 2.2em;
+        font-weight: 700;
+        text-align: center;
+        justify-self: center;
+      }
+
+      /* Main container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      /* Quarter info banner */
+      .quarter-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #0d47a1;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 15px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.2em;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      /* Statistics summary */
+      .stats-summary {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      }
+
+      .stat-number {
+        font-family: "Roboto Slab", serif;
+        font-size: 2.5em;
+        font-weight: 700;
+        color: #007bff;
+        display: block;
+      }
+
+      .stat-label {
+        font-weight: 500;
+        color: #495057;
+        margin-top: 5px;
+      }
+
+      /* Staff member cards */
+      .staff-container {
+        background: white;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .staff-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      }
+
+      .staff-name {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.5em;
+        font-weight: 600;
+        color: #007bff;
+        padding: 25px 30px;
         margin: 0;
-        font-size: 24px;
-        text-align: center;
-        flex-grow: 1; /* Make title take up available space */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
+        border-bottom: 1px solid #e9ecef;
       }
 
-      /* Responsive styling for header */
-      @media (max-width: 600px) {
-        header {
-          flex-direction: column;
-          align-items: flex-start;
-          padding: 15px;
-        }
-        h1 {
-          text-align: left;
-          font-size: 20px;
-        }
+      .staff-name:hover {
+        color: #0056b3;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
       }
 
-      /* Basic styles for the availability table */
-      table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added box-shadow */
-        background-color: white; /* Added background-color */
+      .staff-name::after {
+        content: "▼";
+        float: right;
+        transition: transform 0.3s ease;
+        font-size: 0.8em;
       }
 
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: center;
-        font-size: 14px; /* Standardized font size */
+      .staff-name.expanded::after {
+        transform: rotate(180deg);
       }
 
-      th {
-        background-color: #007bff;
-        color: white; /* Updated header color to match second HTML */
-        font-weight: bold;
-      }
-
-      td {
-        background-color: #f9f9f9;
-      }
-
-      td:hover {
-        background-color: #e0f0ff; /* Added hover effect for cells */
-      }
-
+      /* Hidden content styling */
       .hidden {
         display: none;
       }
 
-      /* Style for additional details */
+      .content-section {
+        padding: 0 30px 30px 30px;
+      }
+
+      /* Availability table styling */
+      .availability-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .availability-table thead th {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 15px 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .availability-table tbody td {
+        padding: 12px 10px;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        background: #fafbfc;
+        font-size: 13px;
+        transition: all 0.3s ease;
+      }
+
+      .availability-table tbody td:first-child {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        text-align: left;
+        padding-left: 20px;
+      }
+
+      .availability-table tbody tr:hover td {
+        background-color: #e3f2fd;
+      }
+
+      /* Color coding for preferences */
+      .availability-table td[data-preference="great"] {
+        background-color: #d4edda !important;
+        color: #155724;
+        font-weight: 600;
+      }
+
+      .availability-table td[data-preference="ok"] {
+        background-color: #fff3cd !important;
+        color: #856404;
+      }
+
+      .availability-table td[data-preference="pref_no"] {
+        background-color: #f8d7da !important;
+        color: #721c24;
+      }
+
+      .availability-table td[data-preference="nooo"] {
+        background-color: #f5c6cb !important;
+        color: #721c24;
+        font-weight: 600;
+      }
+
+      /* Additional details styling */
       .additional-details {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
         margin-top: 20px;
-        border: 1px solid #ddd;
-        padding: 15px; /* Increased padding */
-        background-color: #f9f9f9;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added shadow */
+        border-left: 4px solid #007bff;
       }
 
       .additional-details p {
-        margin: 8px 0;
-        font-size: 14px;
-        line-height: 1.5;
+        margin: 12px 0;
+        line-height: 1.6;
       }
 
-      /* Hover effects for staff names */
-      h2 {
-        font-size: 20px;
-        margin-bottom: 10px;
-        cursor: pointer;
+      .additional-details strong {
+        color: #495057;
+        font-weight: 600;
+      }
+
+      /* No data message */
+      .no-data-message {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+        font-size: 1.2em;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .no-data-message h3 {
+        font-family: "Roboto Slab", serif;
         color: #007bff;
-        transition: color 0.3s;
+        margin-bottom: 15px;
+        font-size: 1.8em;
       }
 
-      h2:hover {
-        color: #0056b3;
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .header-content {
+          grid-template-columns: 1fr;
+          text-align: center;
+          gap: 15px;
+        }
+
+        .header-title {
+          font-size: 1.8em;
+        }
+
+        .back-arrow {
+          justify-self: center;
+        }
+
+        .container {
+          padding: 20px 10px;
+        }
+
+        .stats-summary {
+          grid-template-columns: 1fr;
+          padding: 20px;
+        }
+
+        .staff-name {
+          font-size: 1.3em;
+          padding: 20px;
+        }
+
+        .content-section {
+          padding: 0 20px 20px 20px;
+        }
+
+        .availability-table {
+          font-size: 11px;
+        }
+
+        .availability-table thead th,
+        .availability-table tbody td {
+          padding: 8px 5px;
+        }
+
+        .availability-table tbody td:first-child {
+          padding-left: 10px;
+        }
       }
 
-      /* Responsive styling for mobile devices */
-      @media (max-width: 600px) {
-        table th,
-        table td {
-          font-size: 12px;
-        }
+      /* Animation */
+      .staff-container {
+        animation: fadeInUp 0.4s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
-        h2 {
-          font-size: 18px;
+      .staff-container:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .staff-container:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .staff-container:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .staff-container:nth-child(4) {
+        animation-delay: 0.4s;
+      }
+      .staff-container:nth-child(5) {
+        animation-delay: 0.5s;
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
+      }
+
+      /* Legend for color coding */
+      .preference-legend {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .legend-title {
+        font-family: "Roboto Slab", serif;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #495057;
+      }
+
+      .legend-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      .legend-item {
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .legend-great {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .legend-ok {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .legend-pref-no {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .legend-nooo {
+        background-color: #f5c6cb;
+        color: #721c24;
       }
     </style>
   </head>
   <body>
-    <header>
-      <a href="allstaff.html" class="back-arrow"
-        >&#9664; Back to All-Staff Home</a
-      >
-      <h1>Staff Availability</h1>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="allstaff.html" class="back-arrow">
+          <span>&#9664;</span> Back to All-Staff Home
+        </a>
+        <h1 class="header-title">Staff Availability</h1>
+        <div></div>
+        <!-- Spacer for grid balance -->
+      </div>
     </header>
 
-    <div id="staffList"></div>
+    <div class="container">
+      <!-- Quarter Info Banner -->
+      <div id="quarterInfo" class="quarter-info"></div>
+
+      <!-- Statistics Summary -->
+      <div id="statsSummary" class="stats-summary" style="display: none">
+        <div class="stat-item">
+          <span id="totalCount" class="stat-number">0</span>
+          <div class="stat-label">Total Responses</div>
+        </div>
+        <div class="stat-item">
+          <span id="floaterCount" class="stat-number">0</span>
+          <div class="stat-label">Floaters</div>
+        </div>
+        <div class="stat-item">
+          <span id="fullStafferCount" class="stat-number">0</span>
+          <div class="stat-label">Full Staffers</div>
+        </div>
+      </div>
+
+      <!-- Preference Legend -->
+      <div class="preference-legend">
+        <div class="legend-title">Preference Legend:</div>
+        <div class="legend-items">
+          <div class="legend-item legend-great">Great!</div>
+          <div class="legend-item legend-ok">OK</div>
+          <div class="legend-item legend-pref-no">Prefer No</div>
+          <div class="legend-item legend-nooo">NOOO</div>
+        </div>
+      </div>
+
+      <!-- Staff List Container -->
+      <div id="staffList"></div>
+    </div>
 
     <script type="module">
       import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
       const supabase = createClient(
-        // UPDATE HERE EACH QUARTER
-        "https://uwbudrkqyjxcnlpkezdt.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3YnVkcmtxeWp4Y25scGtlemR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NjI2MjksImV4cCI6MjA1OTEzODYyOX0.8-3ubutM6TH54iw2UBLRGSbCECZG4dzjoRgarBzLLBw"
+        "https://bhzwyokvygnxnqdocjhy.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoend5b2t2eWdueG5xZG9jamh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTQ1MDYsImV4cCI6MjA3MzczMDUwNn0.vSyiiRvQNV9DOcZRUHH31YkNqC5KZHgo0IqZ0DBcpUE"
       );
+
+      function getCurrentQuarter() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+
+        if (month >= 1 && month <= 3) return `winter${year}`;
+        if (month >= 4 && month <= 6) return `spring${year}`;
+        if (month >= 7 && month < 9) return `summer${year}`;
+        return `fall${year}`;
+      }
+
+      function getQuarterDisplayName() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+
+        if (month >= 1 && month <= 3) return `Winter ${year}`;
+        if (month >= 4 && month <= 6) return `Spring ${year}`;
+        if (month >= 7 && month < 9) return `Summer ${year}`;
+        return `Fall ${year}`;
+      }
 
       async function fetchResponses() {
         try {
+          const currentQuarter = getCurrentQuarter();
+          console.log(`Fetching availability for: ${currentQuarter}`);
+
           const { data, error } = await supabase
-            .from("spr25_responses")
-            .select("*");
+            .from("staff_responses")
+            .select("*")
+            .eq("quarter", currentQuarter);
+
           if (error) throw error;
+
+          if (!data || data.length === 0) {
+            console.warn(`No response data found for ${currentQuarter}.`);
+            return [];
+          }
 
           const shiftFields = [
             "monday_shift_9_12",
@@ -223,77 +561,54 @@
             "There has been a problem with your fetch operation:",
             error
           );
+          return [];
         }
       }
 
       function createAvailabilityGrid(preferences) {
         const table = document.createElement("table");
-        table.innerHTML = `
-     <thead>
-       <tr>
-         <th>Time Slot</th>
-         <th>Sunday</th>
-         <th>Monday</th>
-         <th>Tuesday</th>
-         <th>Wednesday</th>
-         <th>Thursday</th>
-         <th>Friday</th>
-         <th>Saturday</th>
-       </tr>
-     </thead>
-     <tbody>
-       <tr>
-         <td>9am to 12pm</td>
-         <td>${preferences[30]}</td> 
-         <td>${preferences[0]}</td>  
-         <td>${preferences[5]}</td>  
-         <td>${preferences[10]}</td> 
-         <td>${preferences[15]}</td> 
-         <td>${preferences[20]}</td> 
-         <td>${preferences[25]}</td> 
-       </tr>
-       <tr>
-         <td>12pm to 3pm</td>
-         <td>${preferences[31]}</td> 
-         <td>${preferences[1]}</td>  
-         <td>${preferences[6]}</td>  
-         <td>${preferences[11]}</td> 
-         <td>${preferences[16]}</td> 
-         <td>${preferences[21]}</td> 
-         <td>${preferences[26]}</td> 
-       </tr>
-       <tr>
-         <td>3pm to 6pm</td>
-         <td>${preferences[32]}</td> 
-         <td>${preferences[2]}</td>  
-         <td>${preferences[7]}</td>  
-         <td>${preferences[12]}</td> 
-         <td>${preferences[17]}</td> 
-         <td>${preferences[22]}</td> 
-         <td>${preferences[27]}</td> 
-       </tr>
-       <tr>
-         <td>6pm to 9pm</td>
-         <td>${preferences[33]}</td> 
-         <td>${preferences[3]}</td>  
-         <td>${preferences[8]}</td>  
-         <td>${preferences[13]}</td> 
-         <td>${preferences[18]}</td> 
-         <td>${preferences[23]}</td> 
-         <td>${preferences[28]}</td> 
-       </tr>
-       <tr>
-         <td>9pm to 12am</td>
-         <td>${preferences[34]}</td> 
-         <td>${preferences[4]}</td>  
-         <td>${preferences[9]}</td>  
-         <td>${preferences[14]}</td> 
-         <td>${preferences[19]}</td> 
-         <td>${preferences[24]}</td> 
-         <td>${preferences[29]}</td> 
-       </tr>
-     </tbody>
-   `;
+        table.classList.add("availability-table");
+
+        // Create table with color-coded cells
+        const timeSlots = [
+          "9am to 12pm",
+          "12pm to 3pm",
+          "3pm to 6pm",
+          "6pm to 9pm",
+          "9pm to 12am",
+        ];
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+
+        let tableHTML = `
+          <thead>
+            <tr>
+              <th>Time Slot</th>
+              ${days.map((day) => `<th>${day}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+        `;
+
+        timeSlots.forEach((timeSlot, timeIndex) => {
+          tableHTML += `<tr><td>${timeSlot}</td>`;
+          days.forEach((day, dayIndex) => {
+            const prefIndex = [30, 0, 5, 10, 15, 20, 25][dayIndex] + timeIndex;
+            const preference = preferences[prefIndex] || "N/A";
+            tableHTML += `<td data-preference="${preference}">${preference}</td>`;
+          });
+          tableHTML += `</tr>`;
+        });
+
+        tableHTML += `</tbody>`;
+        table.innerHTML = tableHTML;
         return table;
       }
 
@@ -301,48 +616,69 @@
         const detailsDiv = document.createElement("div");
         detailsDiv.classList.add("additional-details");
         detailsDiv.innerHTML = `
-       <p><strong>Email:</strong> ${staffer.email}</p>
-       <p><strong>Phone Number:</strong> ${staffer.phone_number}</p>
-       <p><strong>Grad Year:</strong> ${staffer.grad_year}</p>
-       <p><strong>Residence:</strong> ${staffer.residence}</p>
-       <p><strong>Double-Staffed Selection:</strong> ${staffer.doubleStaffedSelection}</p>
-       <p><strong>Floater or Full-Staff? </strong> ${staffer.floater}</p>
-       <p><strong>Additional Info:</strong> ${staffer.additional}</p>
-       <p><strong>Snacks:</strong> ${staffer.snacks}</p>
-       <p><strong>Concerns:</strong> ${staffer.concerns}</p>
-       <p><strong>Suggestions:</strong> ${staffer.suggestions}</p>
-     `;
+          <p><strong>Email:</strong> ${staffer.email || "N/A"}</p>
+          <p><strong>Phone Number:</strong> ${staffer.phone_number || "N/A"}</p>
+          <p><strong>Grad Year:</strong> ${staffer.grad_year || "N/A"}</p>
+          <p><strong>Residence:</strong> ${staffer.residence || "N/A"}</p>
+          <p><strong>Double-Staffed Selection:</strong> ${
+            staffer.doubleStaffedSelection || "N/A"
+          }</p>
+          <p><strong>Floater or Full-Staff:</strong> ${
+            staffer.floater || "N/A"
+          }</p>
+          <p><strong>Additional Info:</strong> ${
+            staffer.additional || "N/A"
+          }</p>
+          <p><strong>Snacks:</strong> ${staffer.snacks || "N/A"}</p>
+          <p><strong>Concerns:</strong> ${staffer.concerns || "N/A"}</p>
+          <p><strong>Suggestions:</strong> ${staffer.suggestions || "N/A"}</p>
+        `;
         return detailsDiv;
       }
 
       async function displayStaffers() {
+        const quarterInfoContainer = document.getElementById("quarterInfo");
         const staffListContainer = document.getElementById("staffList");
+        const statsSummary = document.getElementById("statsSummary");
+        const currentQuarter = getCurrentQuarter();
+        const quarterDisplay = getQuarterDisplayName();
+
+        quarterInfoContainer.textContent = `Showing availability for ${quarterDisplay}`;
+
         const staffers = await fetchResponses();
 
         let floaterCount = 0;
         let fullStafferCount = 0;
 
-        if (staffers) {
-          staffers.forEach((staffer) => {
+        if (staffers && staffers.length > 0) {
+          // Show statistics
+          statsSummary.style.display = "grid";
+
+          staffers.forEach((staffer, index) => {
             const stafferContainer = document.createElement("div");
+            stafferContainer.classList.add("staff-container");
+
             const stafferName = document.createElement("h2");
+            stafferName.classList.add("staff-name");
             stafferName.textContent = staffer.fullName;
-            stafferContainer.appendChild(stafferName);
+
+            const contentSection = document.createElement("div");
+            contentSection.classList.add("content-section", "hidden");
 
             const availabilityGrid = createAvailabilityGrid(
               staffer.preferences
             );
-            availabilityGrid.classList.add("hidden");
-
             const additionalDetails = createAdditionalDetails(staffer);
-            additionalDetails.classList.add("hidden");
 
-            stafferContainer.appendChild(availabilityGrid);
-            stafferContainer.appendChild(additionalDetails);
+            contentSection.appendChild(availabilityGrid);
+            contentSection.appendChild(additionalDetails);
+
+            stafferContainer.appendChild(stafferName);
+            stafferContainer.appendChild(contentSection);
 
             stafferName.addEventListener("click", () => {
-              availabilityGrid.classList.toggle("hidden");
-              additionalDetails.classList.toggle("hidden");
+              contentSection.classList.toggle("hidden");
+              stafferName.classList.toggle("expanded");
             });
 
             staffListContainer.appendChild(stafferContainer);
@@ -354,17 +690,20 @@
             }
           });
 
-          // Insert floater and full staffer counts at the top
-          const countDiv = document.createElement("div");
-          countDiv.innerHTML = `
-             <p>Floater Count: ${floaterCount}</p>
-             <p>Full Staffer Count: ${fullStafferCount}</p>
-           `;
-
-          staffListContainer.insertBefore(
-            countDiv,
-            staffListContainer.firstChild
-          );
+          // Update statistics
+          document.getElementById("totalCount").textContent = staffers.length;
+          document.getElementById("floaterCount").textContent = floaterCount;
+          document.getElementById("fullStafferCount").textContent =
+            fullStafferCount;
+        } else {
+          const noDataDiv = document.createElement("div");
+          noDataDiv.classList.add("no-data-message");
+          noDataDiv.innerHTML = `
+            <h3>No Staff Responses Found</h3>
+            <p>No staff responses found for ${quarterDisplay}.<br>
+            Staff members need to submit their availability preferences first.</p>
+          `;
+          staffListContainer.appendChild(noDataDiv);
         }
       }
 
