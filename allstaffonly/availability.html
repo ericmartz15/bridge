@@ -260,6 +260,38 @@
         font-weight: 600;
       }
 
+      /* Remove button styling */
+      .remove-button {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+      }
+
+      .remove-button:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+      }
+
+      .remove-button:active {
+        transform: translateY(0);
+      }
+
+      .remove-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
       /* No data message */
       .no-data-message {
         text-align: center;
@@ -402,6 +434,87 @@
         background-color: #f5c6cb;
         color: #721c24;
       }
+
+      /* Modal styles for confirmation */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 30px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+
+      .modal h3 {
+        font-family: "Roboto Slab", serif;
+        color: #dc3545;
+        margin-bottom: 15px;
+        font-size: 1.5em;
+      }
+
+      .modal p {
+        margin-bottom: 25px;
+        color: #6c757d;
+        line-height: 1.6;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+      }
+
+      .modal-button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .modal-confirm {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+      }
+
+      .modal-confirm:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+        transform: translateY(-2px);
+      }
+
+      .modal-cancel {
+        background: #6c757d;
+        color: white;
+      }
+
+      .modal-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body>
@@ -450,6 +563,24 @@
 
       <!-- Staff List Container -->
       <div id="staffList"></div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+      <div class="modal-content">
+        <h3>Confirm Removal</h3>
+        <p id="modalMessage">
+          Are you sure you want to remove this staff member's availability data?
+        </p>
+        <div class="modal-buttons">
+          <button id="confirmRemove" class="modal-button modal-confirm">
+            Remove
+          </button>
+          <button id="cancelRemove" class="modal-button modal-cancel">
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
 
     <script type="module">
@@ -542,6 +673,7 @@
               (shiftField) => row[shiftField]
             );
             return {
+              id: row.id, // Include the database ID for deletion
               fullName: `${row.fname} ${row.lname}`,
               preferences,
               doubleStaffedSelection: row.double_shift,
@@ -563,6 +695,57 @@
           );
           return [];
         }
+      }
+
+      async function removeStaffer(stafferId, stafferName) {
+        try {
+          const { error } = await supabase
+            .from("staff_responses")
+            .delete()
+            .eq("id", stafferId);
+
+          if (error) throw error;
+
+          console.log(`Successfully removed staffer: ${stafferName}`);
+          return true;
+        } catch (error) {
+          console.error(`Error removing staffer ${stafferName}:`, error);
+          alert(`Failed to remove ${stafferName}. Please try again.`);
+          return false;
+        }
+      }
+
+      function showConfirmationModal(stafferName, onConfirm) {
+        const modal = document.getElementById("confirmModal");
+        const message = document.getElementById("modalMessage");
+        const confirmBtn = document.getElementById("confirmRemove");
+        const cancelBtn = document.getElementById("cancelRemove");
+
+        message.textContent = `Are you sure you want to remove ${stafferName}'s availability data? This action cannot be undone.`;
+        modal.style.display = "block";
+
+        // Remove any existing event listeners
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        // Add new event listeners
+        newConfirmBtn.addEventListener("click", () => {
+          modal.style.display = "none";
+          onConfirm();
+        });
+
+        newCancelBtn.addEventListener("click", () => {
+          modal.style.display = "none";
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            modal.style.display = "none";
+          }
+        });
       }
 
       function createAvailabilityGrid(preferences) {
@@ -615,6 +798,27 @@
       function createAdditionalDetails(staffer) {
         const detailsDiv = document.createElement("div");
         detailsDiv.classList.add("additional-details");
+
+        const removeButton = document.createElement("button");
+        removeButton.classList.add("remove-button");
+        removeButton.textContent = "Remove Staffer";
+
+        removeButton.addEventListener("click", () => {
+          showConfirmationModal(staffer.fullName, async () => {
+            removeButton.disabled = true;
+            removeButton.textContent = "Removing...";
+
+            const success = await removeStaffer(staffer.id, staffer.fullName);
+            if (success) {
+              // Refresh the page to show updated data
+              window.location.reload();
+            } else {
+              removeButton.disabled = false;
+              removeButton.textContent = "Remove Staffer";
+            }
+          });
+        });
+
         detailsDiv.innerHTML = `
           <p><strong>Email:</strong> ${staffer.email || "N/A"}</p>
           <p><strong>Phone Number:</strong> ${staffer.phone_number || "N/A"}</p>
@@ -633,6 +837,8 @@
           <p><strong>Concerns:</strong> ${staffer.concerns || "N/A"}</p>
           <p><strong>Suggestions:</strong> ${staffer.suggestions || "N/A"}</p>
         `;
+
+        detailsDiv.appendChild(removeButton);
         return detailsDiv;
       }
 
