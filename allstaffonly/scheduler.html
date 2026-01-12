@@ -536,7 +536,7 @@
     <script src="shift.js"></script>
     <script src="csp.js"></script>
 
-    <!-- Supabase integration (unchanged functionality) -->
+    <!-- Supabase integration with fixes -->
     <script type="module">
       import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -576,45 +576,46 @@
             return [];
           }
 
-          const modifiedResults = data.map((row) => {
-            const shiftFields = [
-              "sunday_shift_9_12",
-              "monday_shift_9_12",
-              "tuesday_shift_9_12",
-              "wednesday_shift_9_12",
-              "thursday_shift_9_12",
-              "friday_shift_9_12",
-              "saturday_shift_9_12",
-              "sunday_shift_12_3",
-              "monday_shift_12_3",
-              "tuesday_shift_12_3",
-              "wednesday_shift_12_3",
-              "thursday_shift_12_3",
-              "friday_shift_12_3",
-              "saturday_shift_12_3",
-              "sunday_shift_3_6",
-              "monday_shift_3_6",
-              "tuesday_shift_3_6",
-              "wednesday_shift_3_6",
-              "thursday_shift_3_6",
-              "friday_shift_3_6",
-              "saturday_shift_3_6",
-              "sunday_shift_6_9",
-              "monday_shift_6_9",
-              "tuesday_shift_6_9",
-              "wednesday_shift_6_9",
-              "thursday_shift_6_9",
-              "friday_shift_6_9",
-              "saturday_shift_6_9",
-              "sunday_shift_9_12_pm",
-              "monday_shift_9_12_pm",
-              "tuesday_shift_9_12_pm",
-              "wednesday_shift_9_12_pm",
-              "thursday_shift_9_12_pm",
-              "friday_shift_9_12_pm",
-              "saturday_shift_9_12_pm",
-            ];
+          // FIXED: Correct shift field mapping that matches data-shift indices
+          const shiftFields = [
+            "monday_shift_9_12", // Index 0
+            "monday_shift_12_3", // Index 1
+            "monday_shift_3_6", // Index 2
+            "monday_shift_6_9", // Index 3
+            "monday_shift_9_12_pm", // Index 4
+            "tuesday_shift_9_12", // Index 5
+            "tuesday_shift_12_3", // Index 6
+            "tuesday_shift_3_6", // Index 7
+            "tuesday_shift_6_9", // Index 8
+            "tuesday_shift_9_12_pm", // Index 9
+            "wednesday_shift_9_12", // Index 10
+            "wednesday_shift_12_3", // Index 11
+            "wednesday_shift_3_6", // Index 12
+            "wednesday_shift_6_9", // Index 13
+            "wednesday_shift_9_12_pm", // Index 14
+            "thursday_shift_9_12", // Index 15
+            "thursday_shift_12_3", // Index 16
+            "thursday_shift_3_6", // Index 17
+            "thursday_shift_6_9", // Index 18
+            "thursday_shift_9_12_pm", // Index 19
+            "friday_shift_9_12", // Index 20
+            "friday_shift_12_3", // Index 21
+            "friday_shift_3_6", // Index 22
+            "friday_shift_6_9", // Index 23
+            "friday_shift_9_12_pm", // Index 24
+            "saturday_shift_9_12", // Index 25
+            "saturday_shift_12_3", // Index 26
+            "saturday_shift_3_6", // Index 27
+            "saturday_shift_6_9", // Index 28
+            "saturday_shift_9_12_pm", // Index 29
+            "sunday_shift_9_12", // Index 30
+            "sunday_shift_12_3", // Index 31
+            "sunday_shift_3_6", // Index 32
+            "sunday_shift_6_9", // Index 33
+            "sunday_shift_9_12_pm", // Index 34
+          ];
 
+          const modifiedResults = data.map((row) => {
             const preferences = shiftFields.map(
               (shiftField) => row[shiftField]
             );
@@ -632,12 +633,105 @@
               snacks: row.snacks,
               concerns: row.concerns,
               suggestions: row.suggestions,
+              cannot_staff: row.cannot_staff === true || row.cannot_staff === "true",  // Normalize to boolean
             };
           });
 
           console.log(
             `Found ${modifiedResults.length} responses for ${currentQuarter}`
           );
+
+          // ADDED: Validation checks
+          console.log("=== DATA VALIDATION ===");
+          console.log(`Total responses: ${modifiedResults.length}`);
+
+          // Check preference array length
+          if (modifiedResults.length > 0) {
+            console.log(
+              `Preference array length: ${modifiedResults[0].preferences.length} (expected: 35)`
+            );
+            if (modifiedResults[0].preferences.length !== 35) {
+              console.error("CRITICAL: Preference array length mismatch!");
+            }
+          }
+
+          // Validate preference values (excluding floaters who should have nulls)
+          const validPrefs = ["nooo", "pref_no", "ok", "great"];
+          let invalidPrefs = 0;
+          let floatersWithNulls = 0;
+          let regularStaffersWithNulls = 0;
+
+          modifiedResults.forEach((result) => {
+            const isFloater = result.floater === "floater";
+            let hasNulls = false;
+
+            result.preferences.forEach((pref, index) => {
+              if (pref === null || pref === undefined) {
+                hasNulls = true;
+                if (!isFloater) {
+                  console.warn(
+                    `Regular staffer ${result.fullName} has null preference at shift ${index}`
+                  );
+                  regularStaffersWithNulls++;
+                  // Convert null to "nooo" for regular staffers only
+                  result.preferences[index] = "nooo";
+                }
+                // Leave nulls for floaters as expected
+              } else if (!validPrefs.includes(pref)) {
+                console.warn(
+                  `Invalid preference "${pref}" for ${result.fullName} at shift ${index}`
+                );
+                invalidPrefs++;
+                result.preferences[index] = "nooo";
+              }
+            });
+
+            if (isFloater && hasNulls) {
+              floatersWithNulls++;
+            }
+          });
+
+          console.log(
+            `Floaters with null preferences (expected): ${floatersWithNulls}`
+          );
+          if (regularStaffersWithNulls > 0) {
+            console.warn(
+              `Regular staffers with null preferences (unexpected): ${regularStaffersWithNulls}`
+            );
+          }
+          if (invalidPrefs > 0) {
+            console.warn(
+              `Found ${invalidPrefs} invalid preference values - converted to "nooo"`
+            );
+          }
+
+          // Check floater assignments
+          console.log("Floater assignments:");
+          const validFloaterValues = ["floater", "fullstaff"];
+          let regularStaffers = 0;
+          let floaters = 0;
+          modifiedResults.forEach((result) => {
+            if (!validFloaterValues.includes(result.floater)) {
+              console.warn(
+                `Invalid floater value "${result.floater}" for ${result.fullName}`
+              );
+            }
+            if (result.floater === "floater") {
+              floaters++;
+            } else {
+              regularStaffers++;
+            }
+          });
+          console.log(
+            `Regular staffers: ${regularStaffers}, Floaters: ${floaters}`
+          );
+
+          if (regularStaffers < 35) {
+            console.error(
+              `INSUFFICIENT REGULAR STAFFERS: Have ${regularStaffers}, need at least 35`
+            );
+          }
+
           return modifiedResults;
         } catch (error) {
           console.error("Error fetching responses:", error);
@@ -748,7 +842,82 @@
 
         if (data && data.length > 0) {
           let settings = parseInt(document.getElementById("settings").value);
-          let staffers = data.map(
+          
+          // Get counts for detailed reporting
+          const totalResponses = data.length;
+          
+          // Handle cannot_staff being either boolean or string "true"/"false"
+          const cannotStaffCount = data.filter(d => {
+            return d.cannot_staff === true || d.cannot_staff === "true";
+          }).length;
+          const canStaffCount = data.filter(d => {
+            return d.cannot_staff !== true && d.cannot_staff !== "true";
+          }).length;
+          
+          // Among those who CAN staff, count floaters vs full staffers
+          const canStaffData = data.filter((response) => {
+            return response.cannot_staff !== true && response.cannot_staff !== "true";
+          });
+          const floatersWhoCanStaff = canStaffData.filter(d => d.floater === "floater").length;
+          const fullStaffersWhoCanStaff = canStaffData.filter(d => d.floater !== "floater").length;
+          
+          // Among ALL responses, count floaters vs full staffers
+          const totalFloaters = data.filter(d => d.floater === "floater").length;
+          const totalFullStaffers = data.filter(d => d.floater !== "floater").length;
+          
+          console.log("=== STAFFING BREAKDOWN ===");
+          console.log(`Total responses: ${totalResponses}`);
+          console.log(`Total full staffers: ${totalFullStaffers}`);
+          console.log(`Total floaters: ${totalFloaters}`);
+          console.log(`Cannot staff (all types): ${cannotStaffCount}`);
+          console.log(`Can staff (all types): ${canStaffCount}`);
+          console.log(`  - Full staffers who can staff: ${fullStaffersWhoCanStaff}`);
+          console.log(`  - Floaters who can staff: ${floatersWhoCanStaff}`);
+          console.log(`  - Full staffers who cannot staff: ${totalFullStaffers - fullStaffersWhoCanStaff}`);
+          
+          // DETAILED BREAKDOWN OF ALL FULL STAFFERS
+          console.log("\n=== ALL RESPONSES - FLOATER STATUS ===");
+          data.forEach((d, index) => {
+            const isFloater = d.floater === "floater";
+            const canStaff = d.cannot_staff !== true && d.cannot_staff !== "true";
+            console.log(`${index + 1}. ${d.fname} ${d.lname}: floater="${d.floater}", cannot_staff=${d.cannot_staff}, Type: ${isFloater ? "FLOATER" : "FULL STAFFER"}, ${canStaff ? "CAN STAFF" : "CANNOT STAFF"}`);
+          });
+          
+          console.log("\n=== ALL FULL STAFFERS - DETAILED BREAKDOWN ===");
+          const allFullStaffers = data.filter(d => d.floater !== "floater");
+          console.log(`Total full staffers: ${allFullStaffers.length}`);
+          
+          allFullStaffers.forEach((d, index) => {
+            const cannotStaffValue = d.cannot_staff;
+            const isCannotStaff = cannotStaffValue === true || cannotStaffValue === "true";
+            console.log(`${index + 1}. ${d.fname} ${d.lname}:`);
+            console.log(`   - cannot_staff: ${cannotStaffValue} (type: ${typeof cannotStaffValue}, is excluded: ${isCannotStaff})`);
+            console.log(`   - floater: ${d.floater}`);
+          });
+          
+          console.log("\n=== FULL STAFFERS WHO MARKED CANNOT STAFF ===");
+          const cannotStaffFullStaffers = data.filter(d => 
+            d.floater !== "floater" && (d.cannot_staff === true || d.cannot_staff === "true")
+          );
+          if (cannotStaffFullStaffers.length > 0) {
+            cannotStaffFullStaffers.forEach(d => {
+              console.log(`- ${d.fname} ${d.lname}: cannot_staff = ${d.cannot_staff} (type: ${typeof d.cannot_staff})`);
+            });
+          } else {
+            console.log("None");
+          }
+          
+          // Also log first few full staffers who CAN staff to verify
+          console.log("\n=== SAMPLE FULL STAFFERS WHO CAN STAFF ===");
+          const canStaffFullStaffers = data.filter(d => 
+            d.floater !== "floater" && d.cannot_staff !== true && d.cannot_staff !== "true"
+          );
+          canStaffFullStaffers.slice(0, 5).forEach(d => {
+            console.log(`- ${d.fname} ${d.lname}: cannot_staff = ${d.cannot_staff} (type: ${typeof d.cannot_staff})`);
+          });
+          
+          // Create Staffer objects only for people who can staff
+          let staffers = canStaffData.map(
             (response) =>
               new Staffer(
                 response.fullName,
@@ -766,14 +935,95 @@
               )
           );
 
+          // Filter to regular staffers (not floaters)
+          const regularStaffers = staffers.filter((s) => !s.floater);
+          
+          console.log(`\n=== AFTER CREATING STAFFER OBJECTS ===`);
+          console.log(`Staffer objects created (can staff, all types): ${staffers.length}`);
+          console.log(`Regular staffers (not floaters): ${regularStaffers.length}`);
+          
+          // Check each regular staffer's preferences
+          console.log(`\n=== CHECKING ALL REGULAR STAFFERS' PREFERENCES ===`);
+          regularStaffers.forEach((s, index) => {
+            const nonNoooPrefs = s.preferences.filter(pref => pref && pref !== "nooo");
+            const hasNonNooo = nonNoooPrefs.length > 0;
+            console.log(`${index + 1}. ${s.name}:`);
+            console.log(`   - Has non-NOOO preferences: ${hasNonNooo}`);
+            console.log(`   - Non-NOOO count: ${nonNoooPrefs.length}/35`);
+            if (!hasNonNooo) {
+              console.log(`   - ALL PREFERENCES: ${JSON.stringify(s.preferences.slice(0, 5))}...`);
+            }
+          });
+          
+          // Filter out staffers with all "nooo" preferences
+          const viableStaffers = regularStaffers.filter((s) => {
+            const hasNonNooo = s.preferences.some(pref => 
+              pref && pref !== "nooo"
+            );
+            if (!hasNonNooo) {
+              console.log(`\n⚠️ EXCLUDING ${s.name} - all preferences are "nooo"`);
+            }
+            return hasNonNooo;
+          });
+          
+          const allNoooCount = regularStaffers.length - viableStaffers.length;
+          
+          console.log(`\n=== FINAL FILTERING SUMMARY ===`);
+          console.log(`Step 1 - Total responses: ${totalResponses}`);
+          console.log(`Step 2 - After excluding cannot_staff: ${canStaffData.length}`);
+          console.log(`Step 3 - After filtering to full staffers only: ${regularStaffers.length}`);
+          console.log(`Step 4 - After excluding all-NOOO: ${viableStaffers.length}`);
+          console.log(`\nFINAL VIABLE STAFFERS: ${viableStaffers.length}/35 needed`);
+          console.log(`Missing: ${35 - viableStaffers.length}`);
+          
+          console.log(`\n=== VERIFICATION ===`);
+          console.log(`If you believe you have 39 viable staffers but this shows ${viableStaffers.length}:`);
+          console.log(`- Check the floater field values in the database`);
+          console.log(`- Check the cannot_staff field values in the database`);
+          console.log(`- Check if anyone has all "nooo" or null preferences`);
+          console.log(`\nLook through the detailed logs above to find the ${39 - viableStaffers.length} staffers being incorrectly excluded.`);
+          
+          console.log(`Viable full staffers (can schedule): ${viableStaffers.length}`);
+          console.log(`All-nooo full staffers: ${allNoooCount}`);
+          
+          if (viableStaffers.length < 35) {
+            // Get names of excluded staffers for debugging
+            const cannotStaffNames = data
+              .filter(d => d.floater !== "floater" && (d.cannot_staff === true || d.cannot_staff === "true"))
+              .map(d => `${d.fname} ${d.lname}`)
+              .join(", ");
+            
+            const allNoooNames = regularStaffers
+              .filter(s => !s.preferences.some(pref => pref && pref !== "nooo"))
+              .map(s => s.name)
+              .join(", ");
+            
+            document.getElementById("message").style.display = "block";
+            document.getElementById("message").textContent =
+              `Cannot create schedule: Need at least 35 full staffers who can work shifts.\n\n` +
+              `YOUR STAFFING BREAKDOWN:\n` +
+              `• Total full staffers: ${totalFullStaffers}\n` +
+              `• Total floaters: ${totalFloaters}\n\n` +
+              `FULL STAFFERS WHO CAN BE SCHEDULED: ${viableStaffers.length}/35\n` +
+              `  ✓ Viable for scheduling: ${viableStaffers.length}\n` +
+              `  ✗ Marked "Cannot Staff": ${totalFullStaffers - fullStaffersWhoCanStaff}\n` +
+              `  ✗ All preferences "NOOO": ${allNoooCount}\n\n` +
+              `Need ${35 - viableStaffers.length} more full staffers who can work shifts.\n\n` +
+              `EXCLUDED STAFFERS:\n` +
+              `Cannot Staff (${totalFullStaffers - fullStaffersWhoCanStaff}): ${cannotStaffNames || "none"}\n` +
+              `All NOOO (${allNoooCount}): ${allNoooNames || "none"}`;
+            return;
+          }
+
           let shifts = [];
           for (let i = 0; i < 35; i++) {
             shifts.push(new Shift(i));
           }
 
-          let scheduler = new CSP(staffers, shifts, settings);
+          // Use only viable staffers (can staff, not floater, has non-nooo preferences)
+          let scheduler = new CSP(viableStaffers, shifts, settings);
           let schedule = scheduler.solve();
-          console.log(scheduler.bestSolution);
+          console.log("Best solution:", scheduler.bestSolution);
           console.log("Problem Shifts Set:", scheduler.problemShifts);
           let problemShifts = Array.from(scheduler.problemShifts || []);
 
@@ -817,25 +1067,189 @@
 
           if (schedule === null) {
             document.getElementById("message").style.display = "block";
-            let problemShiftNames = problemShifts.map(
-              (shiftIndex) => shiftFields[shiftIndex]
-            );
-            let message =
-              "No schedule could be configured with the chosen settings. Try again with looser requirements.";
-            message += "\nProblem Shifts (with no available staffers):\n";
+            let problemShifts = Array.from(scheduler.problemShifts || []);
+            let message = "";
+
+            // Check if it's a problem shift issue
             if (problemShifts.length > 0) {
-              message += problemShiftNames.join(", ") + "\n";
+              let problemShiftNames = problemShifts.map(
+                (shiftIndex) => shiftFields[shiftIndex]
+              );
+              message =
+                "Cannot create schedule: Some shifts have no available regular staffers with the current quality setting.\n\n";
+              message +=
+                "Problem Shifts (no staffers meet the quality requirement):\n";
+              message += problemShiftNames.join("\n") + "\n\n";
+              message += "To fix this:\n";
+              message +=
+                "• Try a lower quality setting (e.g., 'Okay' instead of 'Great')\n";
+              message +=
+                "• Ask regular staffers to reconsider their availability for these shifts\n";
+              message +=
+                "• Recruit additional regular staffers who can work these times";
+            } else if (scheduler.numStaffers < 35) {
+              // Insufficient staffers
+              message = `Cannot create schedule: Need at least 35 regular staffers, but only have ${scheduler.numStaffers}.\n`;
+              message += `Floaters (${scheduler.floaters.length}) are not scheduled for regular shifts.\n`;
+              message += `Please recruit ${
+                35 - scheduler.numStaffers
+              } more regular staffers.`;
             } else {
-              message += "None!\n";
+              // Other feasibility issues (likely threshold too restrictive)
+              message =
+                "Cannot create schedule with the current quality setting.\n\n";
+              const settingNames = ["Okay", "Great", "Ideal"];
+              message += `Current setting: "${settingNames[settings]}" - may be too restrictive.\n\n`;
+              message += "Suggestions:\n";
+              message += "• Try a lower quality setting\n";
+              message +=
+                "• Review staff preferences to ensure adequate coverage\n";
+              message +=
+                "• Consider if some staffers could be more flexible with their preferences";
             }
-            message += `\nWe need ${
-              35 - scheduler.numStaffers
-            } more staffers to create a schedule.\n`;
 
             document.getElementById("message").textContent = message;
             document.getElementById("message").style.display = "block";
           } else {
             document.getElementById("message").style.display = "none";
+
+            // === DOUBLE SHIFT ASSIGNMENT LOGIC ===
+            // Use viable staffers (already filtered for can_staff, not floater, has non-nooo preferences)
+            
+            // Get the threshold setting
+            const thresholdSetting = parseInt(document.getElementById("settings").value);
+            const thresholdNames = ["Okay", "Great", "Ideal"];
+            console.log(`\n=== DOUBLE SHIFT ASSIGNMENT (Threshold: ${thresholdNames[thresholdSetting]}) ===`);
+            
+            // Define acceptable preferences based on threshold
+            // 0 = Okay: accept "ok", "great"
+            // 1 = Great: accept "great" only
+            // 2 = Ideal: accept "great" only
+            const acceptablePreferences = thresholdSetting === 0 
+              ? ["ok", "great"] 
+              : ["great"];
+            
+            console.log(`Acceptable preferences for double shifts: ${acceptablePreferences.join(", ")}`);
+            
+            // Find which staffers are already assigned
+            const assignedStaffers = new Set();
+            for (let shiftIndex in schedule) {
+              schedule[shiftIndex].forEach(staffer => {
+                assignedStaffers.add(staffer.name);
+              });
+            }
+            
+            // Find unassigned viable staffers
+            const unassignedStaffers = viableStaffers.filter(
+              s => !assignedStaffers.has(s.name)
+            );
+            
+            console.log(`Total viable staffers: ${viableStaffers.length}`);
+            console.log(`Assigned staffers: ${assignedStaffers.size}`);
+            console.log(`Unassigned staffers: ${unassignedStaffers.length}`);
+            console.log("Unassigned:", unassignedStaffers.map(s => s.name));
+            
+            // Evening shift indices (6-9pm and 9pm-12am)
+            const eveningShifts = [
+              3, 8, 13, 18, 23, 28, 33,  // 6pm-9pm
+              4, 9, 14, 19, 24, 29, 34   // 9pm-12am
+            ];
+            
+            // Try to assign unassigned staffers as double shifts
+            if (unassignedStaffers.length > 0) {
+              console.log(`Attempting to assign ${unassignedStaffers.length} double shifts...`);
+              
+              // Sort evening shifts by staffer preference quality
+              for (let staffer of unassignedStaffers) {
+                let bestShift = null;
+                let bestScore = -1;
+                
+                // First try evening shifts that meet the threshold
+                for (let shiftIndex of eveningShifts) {
+                  if (schedule[shiftIndex]) {
+                    // Check if shift already has 2 people (max allowed)
+                    if (schedule[shiftIndex].length >= 2) {
+                      continue;
+                    }
+                    
+                    const pref = staffer.preferences[shiftIndex];
+                    
+                    // Only consider shifts that meet the threshold requirement
+                    if (!acceptablePreferences.includes(pref)) {
+                      continue;
+                    }
+                    
+                    const score = pref === "great" ? 3 : pref === "ok" ? 2 : 0;
+                    
+                    if (score > bestScore) {
+                      bestScore = score;
+                      bestShift = shiftIndex;
+                    }
+                  }
+                }
+                
+                // If no good evening shift, try all shifts that meet the threshold
+                if (bestShift === null) {
+                  for (let shiftIndex = 0; shiftIndex < 35; shiftIndex++) {
+                    if (schedule[shiftIndex]) {
+                      // Check if shift already has 2 people (max allowed)
+                      if (schedule[shiftIndex].length >= 2) {
+                        continue;
+                      }
+                      
+                      const pref = staffer.preferences[shiftIndex];
+                      
+                      // Only consider shifts that meet the threshold requirement
+                      if (!acceptablePreferences.includes(pref)) {
+                        continue;
+                      }
+                      
+                      const score = pref === "great" ? 3 : pref === "ok" ? 2 : 0;
+                      
+                      if (score > bestScore) {
+                        bestScore = score;
+                        bestShift = shiftIndex;
+                      }
+                    }
+                  }
+                }
+                
+                // Assign to best shift found (only if it has < 2 people and meets threshold)
+                if (bestShift !== null && schedule[bestShift] && schedule[bestShift].length < 2) {
+                  schedule[bestShift].push(staffer);
+                  console.log(`✓ Assigned ${staffer.name} to shift ${bestShift} (${shiftFields[bestShift]}) as double shift with preference: ${staffer.preferences[bestShift]}. Shift now has ${schedule[bestShift].length} people.`);
+                } else if (bestShift !== null && schedule[bestShift].length >= 2) {
+                  console.warn(`✗ Could not assign ${staffer.name} - best acceptable shift ${bestShift} already has 2 people`);
+                } else {
+                  console.warn(`✗ Could not assign ${staffer.name} - no shifts meet the "${thresholdNames[thresholdSetting]}" quality threshold`);
+                }
+              }
+              }
+              
+              // Check if everyone was assigned
+              const stillUnassigned = unassignedStaffers.filter(s => {
+                // Check if this staffer was assigned to any shift
+                for (let shiftIndex in schedule) {
+                  if (schedule[shiftIndex].some(assigned => assigned.name === s.name)) {
+                    return false; // Found them, they're assigned
+                  }
+                }
+                return true; // Not found in any shift
+              });
+              
+              if (stillUnassigned.length > 0) {
+                console.warn(`\n⚠️ WARNING: ${stillUnassigned.length} staffers could not be assigned:`);
+                stillUnassigned.forEach(s => console.warn(`  - ${s.name}`));
+                console.warn(`This may be because all shifts they prefer already have 2 people (max allowed per shift).`);
+              }
+            }
+
+            // Clear all cells first
+            document.querySelectorAll("[data-shift]").forEach((cell) => {
+              cell.textContent = "No assignment";
+            });
+
+            // Fill in assignments
             for (let shiftIndex in schedule) {
               let staffers = schedule[shiftIndex];
               let cell = document.querySelector(`[data-shift="${shiftIndex}"]`);
@@ -845,8 +1259,96 @@
                   .join(", ");
               }
             }
+
+            // Check for threshold relaxation and display warning
+            if (scheduler.thresholdRelaxed) {
+              document.getElementById("message").style.display = "block";
+              document.getElementById("message").style.background = "#fff3cd";
+              document.getElementById("message").style.color = "#856404";
+              document.getElementById("message").style.borderLeft =
+                "4px solid #ffc107";
+
+              const thresholdNames = ["Okay", "Great", "Ideal"];
+              let message = `⚠️ QUALITY SETTING RELAXED\n\n`;
+              message += `Your selected setting "${
+                thresholdNames[scheduler.originalThreshold]
+              }" was too restrictive.\n`;
+              message += `Schedule created with "${
+                thresholdNames[scheduler.usedThreshold]
+              }" setting instead.\n\n`;
+
+              if (
+                scheduler.compromisedAssignments &&
+                scheduler.compromisedAssignments.length > 0
+              ) {
+                message += `STAFFERS ASSIGNED TO LESS-PREFERRED SHIFTS:\n\n`;
+
+                scheduler.compromisedAssignments.forEach((assignment) => {
+                  const shiftName = shiftFields[assignment.shiftIndex];
+                  message += `• ${assignment.stafferName}: ${shiftName} (marked "${assignment.preference}")\n`;
+                });
+
+                message += `\nConsider:\n`;
+                message += `• Asking these staffers about flexibility\n`;
+                message += `• Recruiting additional staff for better coverage\n`;
+                message += `• Using a less restrictive quality setting in the future`;
+              }
+
+              document.getElementById("message").textContent = message;
+            }
+            
+            // Check if all viable staffers were assigned
+            const finalAssignedStaffers = new Set();
+            for (let shiftIndex in schedule) {
+              schedule[shiftIndex].forEach(staffer => {
+                finalAssignedStaffers.add(staffer.name);
+              });
+            }
+            
+            const finalUnassigned = viableStaffers.filter(
+              s => !finalAssignedStaffers.has(s.name)
+            );
+            
+            if (finalUnassigned.length > 0) {
+              document.getElementById("message").style.display = "block";
+              document.getElementById("message").style.background = "#fff3cd";
+              document.getElementById("message").style.color = "#856404";
+              document.getElementById("message").style.borderLeft = "4px solid #ffc107";
+              
+              let message = `⚠️ INCOMPLETE ASSIGNMENT\n\n`;
+              message += `${finalUnassigned.length} viable staffer(s) could not be assigned to any shift.\n`;
+              message += `This may be because:\n`;
+              message += `• All shifts they marked as acceptable already have 2 people (max per shift)\n`;
+              message += `• The "${thresholdNames[thresholdSetting]}" quality setting is too restrictive for their preferences\n\n`;
+              message += `UNASSIGNED STAFFERS:\n`;
+              finalUnassigned.forEach(s => {
+                message += `• ${s.name}\n`;
+              });
+              message += `\nTo resolve:\n`;
+              message += `• Try a lower quality setting (e.g., "${thresholdNames[Math.max(0, thresholdSetting - 1)]}")\n`;
+              message += `• Ask these staffers to be more flexible with their preferences\n`;
+              message += `• Ask staffers on double-staffed shifts if they can switch\n`;
+              message += `• Manually assign these staffers by clicking on shifts`;
+              
+              document.getElementById("message").textContent = message;
+            }
+
+            // Check for unfilled shifts
+            let unfilledShifts = 0;
+            for (let i = 0; i < 35; i++) {
+              if (!schedule[i]) {
+                unfilledShifts++;
+              }
+            }
+
+            if (unfilledShifts > 0 && !scheduler.thresholdRelaxed) {
+              document.getElementById("message").style.display = "block";
+              document.getElementById(
+                "message"
+              ).textContent = `WARNING: ${unfilledShifts} shifts could not be filled. Check console for details.`;
+            }
+
             document.getElementById("saveButton").style.display = "block";
-          }
         } else {
           alert(
             "No staff responses found. Please ensure staff have submitted their preferences for the current quarter."
@@ -861,11 +1363,22 @@
       document.querySelectorAll("[data-shift]").forEach((cell) => {
         cell.addEventListener("click", function () {
           const newStaffers = prompt(
-            "Enter staff names separated by commas:",
+            "Enter staff names separated by commas (max 2 people per shift):",
             cell.textContent
           );
           if (newStaffers !== null) {
-            cell.textContent = newStaffers.trim();
+            const trimmed = newStaffers.trim();
+            if (trimmed === "" || trimmed === "No assignment") {
+              cell.textContent = "No assignment";
+            } else {
+              // Count the number of people
+              const stafferList = trimmed.split(",").map(s => s.trim()).filter(s => s !== "");
+              if (stafferList.length > 2) {
+                alert(`Error: Maximum 2 people per shift.\nYou entered ${stafferList.length} people.\n\nPlease enter no more than 2 names.`);
+              } else {
+                cell.textContent = stafferList.join(", ");
+              }
+            }
           }
         });
       });

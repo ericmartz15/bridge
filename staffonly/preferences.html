@@ -368,6 +368,99 @@
         resize: vertical;
         min-height: 80px;
       }
+
+      /* New styles for editable form functionality */
+      button.secondary-btn,
+      button.cannot-staff-btn {
+        color: white;
+        padding: 18px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: "Roboto", Arial, sans-serif;
+        margin: 0 10px;
+      }
+
+      button.secondary-btn {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+      }
+
+      button.secondary-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+      }
+
+      button.cannot-staff-btn {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+      }
+
+      button.cannot-staff-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+      }
+
+      button.cannot-staff-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .success-message {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+      }
+
+      .success-message h3 {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        color: white;
+      }
+
+      .success-message p {
+        color: white;
+        opacity: 0.95;
+      }
+
+      .cannot-staff-notice {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+        border: 2px solid #ffc107;
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
+      }
+
+      .cannot-staff-notice h3 {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.3em;
+        margin-bottom: 10px;
+      }
+
+      form.disabled fieldset {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      form.disabled input,
+      form.disabled textarea,
+      form.disabled select {
+        background-color: #e9ecef;
+      }
     </style>
   </head>
   <body>
@@ -384,7 +477,33 @@
     </header>
 
     <div class="container">
+      <!-- Success message (hidden by default) -->
+      <div id="successMessage" class="success-message" style="display: none">
+        <h3>✓ Preferences Submitted Successfully!</h3>
+        <p>
+          Your shift preferences have been recorded. You can edit them below if
+          needed.
+        </p>
+      </div>
+
+      <!-- Cannot staff notice (hidden by default) -->
+      <div
+        id="cannotStaffNotice"
+        class="cannot-staff-notice"
+        style="display: none"
+      >
+        <h3>⚠ Submitting: Cannot Staff This Quarter</h3>
+        <p>Submitting your response now...</p>
+      </div>
+
       <form id="myForm" enctype="multipart/form-data">
+        <!-- Hidden field for cannot staff status -->
+        <input
+          type="hidden"
+          id="cannotStaffHidden"
+          name="cannot_staff"
+          value="false"
+        />
         <fieldset>
           <legend>Contact Information</legend>
           <label for="fname">First name:</label>
@@ -411,9 +530,9 @@
           <p>
             Please check here to indicate that you have read our
             <a
-              href="https://docs.google.com/document/d/1qoVS6bg5iqfdgVuvcnYF2tu4jVcsfyn1qTuOInODY6c/edit?usp=sharing"
+              href="https://docs.google.com/document/d/10e3Yku7oIprtICj_j4QaM9Ph55RWLTkAIg4czRC5D4s/edit?usp=sharing"
             >
-              Autumn 2025 staffer agreement.
+              Winter 2026 staffer agreement.
             </a>
           </p>
           <label>
@@ -1412,7 +1531,22 @@
         </fieldset>
 
         <div class="submit-container">
-          <input type="submit" value="Submit Preferences" />
+          <input type="submit" id="submitBtn" value="Submit Preferences" />
+          <button
+            type="button"
+            id="cannotStaffBtn"
+            class="secondary-btn cannot-staff-btn"
+          >
+            Cannot Staff This Quarter
+          </button>
+          <button
+            type="button"
+            id="editBtn"
+            class="secondary-btn"
+            style="display: none"
+          >
+            Edit My Responses
+          </button>
         </div>
       </form>
     </div>
@@ -1420,14 +1554,25 @@
     <script type="module" src="upload.js"></script>
 
     <script>
+      // Form state management
+      let cannotStaff = false;
+
       document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("myForm");
         const fullstaffRadio = document.getElementById("fullstaff");
         const floaterRadio = document.getElementById("floater");
         const shiftPreferences = document.getElementById("shift-preferences");
+        const submitBtn = document.getElementById("submitBtn");
+        const editBtn = document.getElementById("editBtn");
+        const cannotStaffBtn = document.getElementById("cannotStaffBtn");
+        const successMessage = document.getElementById("successMessage");
+        const cannotStaffNotice = document.getElementById("cannotStaffNotice");
+        const cannotStaffHidden = document.getElementById("cannotStaffHidden");
 
+        // Toggle shift preferences based on work preference
         function toggleShiftPreferences() {
           const shiftInputs = shiftPreferences.querySelectorAll("input");
-          if (fullstaffRadio.checked) {
+          if (fullstaffRadio.checked && !cannotStaff) {
             shiftInputs.forEach((input) =>
               input.setAttribute("required", "required")
             );
@@ -1440,6 +1585,171 @@
 
         fullstaffRadio.addEventListener("change", toggleShiftPreferences);
         floaterRadio.addEventListener("change", toggleShiftPreferences);
+
+        // Cannot Staff button handler
+        cannotStaffBtn.addEventListener("click", function () {
+          console.log("=== CANNOT STAFF BUTTON CLICKED ===");
+          console.log("Current cannotStaff state:", cannotStaff);
+          console.log("Current hidden field value:", cannotStaffHidden.value);
+
+          if (!cannotStaff) {
+            console.log(
+              "→ Enabling CANNOT STAFF mode and submitting immediately"
+            );
+            // Enable cannot staff mode
+            cannotStaff = true;
+            cannotStaffHidden.value = "true";
+            console.log("✓ Set cannotStaff flag to:", cannotStaff);
+            console.log("✓ Set hidden field to:", cannotStaffHidden.value);
+
+            // Remove required attributes except for name and email
+            const allInputs = form.querySelectorAll(
+              "input[required], textarea[required]"
+            );
+            console.log(
+              "✓ Removing 'required' from",
+              allInputs.length,
+              "fields (except name and email)"
+            );
+            allInputs.forEach((input) => {
+              // Keep fname, lname, and email required even when cannot staff
+              if (
+                input.id !== "fname" &&
+                input.id !== "lname" &&
+                input.id !== "email"
+              ) {
+                input.removeAttribute("required");
+              }
+            });
+
+            // Show notice
+            cannotStaffNotice.style.display = "block";
+            console.log("✓ Showing yellow warning banner");
+
+            // Change button text and disable it
+            cannotStaffBtn.textContent = "Submitting...";
+            cannotStaffBtn.disabled = true;
+            console.log("✓ Changed button to 'Submitting...' and disabled it");
+
+            // Submit the form automatically after a brief delay to show the banner
+            console.log("✓ Automatically submitting form in 500ms...");
+            setTimeout(() => {
+              console.log("→ Triggering form submission now");
+              form.dispatchEvent(
+                new Event("submit", { bubbles: true, cancelable: true })
+              );
+            }, 500);
+          } else {
+            console.log("→ UNDOING cannot staff mode (back to normal)");
+            // Disable cannot staff mode (undo)
+            cannotStaff = false;
+            cannotStaffHidden.value = "false";
+            console.log("✓ Set cannotStaff flag to:", cannotStaff);
+            console.log("✓ Set hidden field to:", cannotStaffHidden.value);
+
+            // Restore all original required fields
+            console.log("✓ Restoring 'required' attributes");
+            document
+              .getElementById("fname")
+              .setAttribute("required", "required");
+            document
+              .getElementById("lname")
+              .setAttribute("required", "required");
+            document
+              .getElementById("email")
+              .setAttribute("required", "required");
+            document
+              .getElementById("phone")
+              .setAttribute("required", "required");
+            document
+              .getElementById("grad")
+              .setAttribute("required", "required");
+            document
+              .getElementById("residence")
+              .setAttribute("required", "required");
+            document
+              .getElementById("agreement")
+              .setAttribute("required", "required");
+            document
+              .getElementById("pdfUpload")
+              .setAttribute("required", "required");
+
+            const floaterInputs = document.querySelectorAll(
+              "input[name='floater']"
+            );
+            floaterInputs.forEach((input) =>
+              input.setAttribute("required", "required")
+            );
+
+            // Hide notice
+            cannotStaffNotice.style.display = "none";
+            console.log("✓ Hiding yellow warning banner");
+
+            // Restore button
+            cannotStaffBtn.textContent = "Cannot Staff This Quarter";
+            cannotStaffBtn.classList.add("cannot-staff-btn");
+            cannotStaffBtn.disabled = false;
+            console.log("✓ Changed button back to 'Cannot Staff This Quarter'");
+
+            // Re-apply shift preferences logic
+            toggleShiftPreferences();
+          }
+
+          console.log("=== BUTTON CLICK COMPLETE ===");
+          console.log("Final state - cannotStaff:", cannotStaff);
+          console.log("Final state - hidden field:", cannotStaffHidden.value);
+        });
+
+        // Edit button handler
+        editBtn.addEventListener("click", function () {
+          // Hide success message
+          successMessage.style.display = "none";
+
+          // Hide cannot staff notice (in case it was showing)
+          cannotStaffNotice.style.display = "none";
+
+          // Reset cannot staff state and hidden field
+          cannotStaff = false;
+          cannotStaffHidden.value = "false";
+          console.log("Edit mode: Reset cannot_staff to false");
+
+          // Enable form
+          form.classList.remove("disabled");
+
+          // Show submit button and cannot staff button (properly reset), hide edit button
+          submitBtn.style.display = "inline-block";
+
+          // Reset cannot staff button to initial state
+          cannotStaffBtn.style.display = "inline-block";
+          cannotStaffBtn.disabled = false;
+          cannotStaffBtn.textContent = "Cannot Staff This Quarter";
+          cannotStaffBtn.classList.add("cannot-staff-btn");
+
+          editBtn.style.display = "none";
+
+          // Change submit button text
+          submitBtn.value = "Update Preferences";
+
+          // Re-apply shift preferences validation logic
+          toggleShiftPreferences();
+        });
+
+        // Note: The actual form submission is handled by upload.js
+        // The upload.js will be modified to show success message instead of redirecting
+
+        // Add a submit listener just for logging (doesn't prevent submission)
+        form.addEventListener(
+          "submit",
+          function (e) {
+            console.log("=== INLINE SCRIPT: Form is about to submit ===");
+            console.log("cannotStaff flag:", cannotStaff);
+            console.log("Hidden field value:", cannotStaffHidden.value);
+            console.log(
+              "This will be passed to upload.js which handles the actual submission"
+            );
+          },
+          true
+        ); // Use capture phase so this runs first
       });
     </script>
   </body>

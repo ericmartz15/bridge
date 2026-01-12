@@ -292,6 +292,151 @@
         box-shadow: none;
       }
 
+      /* Edit button styling */
+      .edit-button {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 20px;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+      }
+
+      .edit-button:hover {
+        background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+      }
+
+      .edit-button:active {
+        transform: translateY(0);
+      }
+
+      .edit-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* Cannot staff badge */
+      .cannot-staff-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: #000;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.65em;
+        font-weight: 700;
+        margin-left: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 5px rgba(255, 193, 7, 0.3);
+      }
+
+      /* Button container */
+      .button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      /* Editable field styling */
+      .editable-field {
+        display: inline-block;
+        padding: 3px 8px;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      .editable-field.editing {
+        border-color: #007bff;
+        background: #fff;
+        min-width: 200px;
+      }
+
+      .editable-field:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+      }
+
+      .pref-select {
+        width: 100%;
+        padding: 5px;
+        border: 2px solid #007bff;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: white;
+        transition: all 0.3s ease;
+      }
+
+      .pref-select:hover {
+        border-color: #0056b3;
+        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+      }
+
+      .pref-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+      }
+
+      .availability-table td:has(.pref-select) {
+        padding: 8px 5px;
+      }
+
+      .save-edit-button {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 15px;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+      }
+
+      .save-edit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+      }
+
+      .cancel-edit-button {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .cancel-edit-button:hover {
+        background: #5a6268;
+      }
+
+      .edit-mode {
+        background: #e3f2fd;
+        border-left: 4px solid #007bff;
+      }
+
       /* No data message */
       .no-data-message {
         text-align: center;
@@ -630,6 +775,39 @@
             return [];
           }
 
+          console.log(
+            `Found ${data.length} total responses for ${currentQuarter}`
+          );
+          console.log("Sample data (first entry):", data[0]); // Log first entry to see structure
+
+          // Log ALL cannot_staff values to debug
+          console.log("All cannot_staff values:");
+          data.forEach((row, index) => {
+            console.log(
+              `  Entry ${index} (${row.fname} ${row.lname}): cannot_staff =`,
+              row.cannot_staff,
+              `(type: ${typeof row.cannot_staff})`
+            );
+          });
+
+          // Try multiple ways to detect cannot_staff
+          const cannotStaffCount1 = data.filter(
+            (row) => row.cannot_staff === "true" || row.cannot_staff === true
+          ).length;
+          console.log(
+            `Cannot staff entries (strict check): ${cannotStaffCount1}`
+          );
+
+          const cannotStaffCount2 = data.filter(
+            (row) =>
+              row.cannot_staff &&
+              row.cannot_staff !== "false" &&
+              row.cannot_staff !== false
+          ).length;
+          console.log(
+            `Cannot staff entries (truthy check): ${cannotStaffCount2}`
+          );
+
           const shiftFields = [
             "monday_shift_9_12",
             "monday_shift_12_3",
@@ -670,12 +848,15 @@
 
           return data.map((row) => {
             const preferences = shiftFields.map(
-              (shiftField) => row[shiftField]
+              (shiftField) => row[shiftField] || null
             );
             return {
               id: row.id, // Include the database ID for deletion
               fullName: `${row.fname} ${row.lname}`,
+              fname: row.fname,
+              lname: row.lname,
               preferences,
+              shiftFields, // Include field names for editing
               doubleStaffedSelection: row.double_shift,
               floater: row.floater,
               email: row.email,
@@ -686,6 +867,14 @@
               snacks: row.snacks,
               concerns: row.concerns,
               suggestions: row.suggestions,
+              // More flexible cannot_staff checking
+              cannot_staff: !!(
+                row.cannot_staff === "true" ||
+                row.cannot_staff === true ||
+                row.cannot_staff === 1 ||
+                row.cannot_staff === "1"
+              ),
+              cannot_staff_raw: row.cannot_staff, // Keep raw value for debugging
             };
           });
         } catch (error) {
@@ -711,6 +900,24 @@
         } catch (error) {
           console.error(`Error removing staffer ${stafferName}:`, error);
           alert(`Failed to remove ${stafferName}. Please try again.`);
+          return false;
+        }
+      }
+
+      async function updateStaffer(stafferId, updates) {
+        try {
+          const { error } = await supabase
+            .from("staff_responses")
+            .update(updates)
+            .eq("id", stafferId);
+
+          if (error) throw error;
+
+          console.log(`Successfully updated staffer with ID: ${stafferId}`);
+          return true;
+        } catch (error) {
+          console.error(`Error updating staffer:`, error);
+          alert(`Failed to update staffer information. Please try again.`);
           return false;
         }
       }
@@ -748,9 +955,11 @@
         });
       }
 
-      function createAvailabilityGrid(preferences) {
+      function createAvailabilityGrid(staffer, editMode = false) {
+        const preferences = staffer.preferences;
         const table = document.createElement("table");
         table.classList.add("availability-table");
+        table.id = `availability-table-${staffer.id}`;
 
         // Create table with color-coded cells
         const timeSlots = [
@@ -785,61 +994,318 @@
           days.forEach((day, dayIndex) => {
             const prefIndex = [30, 0, 5, 10, 15, 20, 25][dayIndex] + timeIndex;
             const preference = preferences[prefIndex] || "N/A";
-            tableHTML += `<td data-preference="${preference}">${preference}</td>`;
+
+            if (editMode) {
+              tableHTML += `<td data-preference="${preference}" data-pref-index="${prefIndex}">
+                <select class="pref-select" data-index="${prefIndex}">
+                  <option value="">N/A</option>
+                  <option value="great" ${
+                    preference === "great" ? "selected" : ""
+                  }>Great</option>
+                  <option value="ok" ${
+                    preference === "ok" ? "selected" : ""
+                  }>OK</option>
+                  <option value="pref_no" ${
+                    preference === "pref_no" ? "selected" : ""
+                  }>Pref No</option>
+                  <option value="nooo" ${
+                    preference === "nooo" ? "selected" : ""
+                  }>NOOO</option>
+                </select>
+              </td>`;
+            } else {
+              tableHTML += `<td data-preference="${preference}">${preference}</td>`;
+            }
           });
           tableHTML += `</tr>`;
         });
 
         tableHTML += `</tbody>`;
         table.innerHTML = tableHTML;
+
+        if (editMode) {
+          // Add styles for select elements
+          table.querySelectorAll(".pref-select").forEach((select) => {
+            select.style.width = "100%";
+            select.style.padding = "5px";
+            select.style.border = "2px solid #007bff";
+            select.style.borderRadius = "4px";
+            select.style.fontSize = "12px";
+            select.style.fontWeight = "600";
+            select.style.cursor = "pointer";
+
+            // Update parent td data-preference on change for visual feedback
+            select.addEventListener("change", (e) => {
+              const td = e.target.parentElement;
+              td.setAttribute("data-preference", e.target.value || "N/A");
+            });
+          });
+        }
+
         return table;
       }
 
-      function createAdditionalDetails(staffer) {
-        const detailsDiv = document.createElement("div");
-        detailsDiv.classList.add("additional-details");
+      function createStafferSection(staffer) {
+        const contentSection = document.createElement("div");
+        contentSection.classList.add("content-section", "hidden");
+        contentSection.id = `content-${staffer.id}`;
 
-        const removeButton = document.createElement("button");
-        removeButton.classList.add("remove-button");
-        removeButton.textContent = "Remove Staffer";
+        let isEditing = false;
+        let originalValues = {
+          ...staffer,
+          preferences: [...staffer.preferences],
+        };
 
-        removeButton.addEventListener("click", () => {
-          showConfirmationModal(staffer.fullName, async () => {
-            removeButton.disabled = true;
-            removeButton.textContent = "Removing...";
+        function renderContent(editMode = false) {
+          contentSection.innerHTML = "";
 
-            const success = await removeStaffer(staffer.id, staffer.fullName);
-            if (success) {
-              // Refresh the page to show updated data
-              window.location.reload();
-            } else {
-              removeButton.disabled = false;
-              removeButton.textContent = "Remove Staffer";
-            }
-          });
-        });
+          // Add availability grid
+          const availabilityGrid = createAvailabilityGrid(staffer, editMode);
+          contentSection.appendChild(availabilityGrid);
 
-        detailsDiv.innerHTML = `
-          <p><strong>Email:</strong> ${staffer.email || "N/A"}</p>
-          <p><strong>Phone Number:</strong> ${staffer.phone_number || "N/A"}</p>
-          <p><strong>Grad Year:</strong> ${staffer.grad_year || "N/A"}</p>
-          <p><strong>Residence:</strong> ${staffer.residence || "N/A"}</p>
-          <p><strong>Double-Staffed Selection:</strong> ${
-            staffer.doubleStaffedSelection || "N/A"
-          }</p>
-          <p><strong>Floater or Full-Staff:</strong> ${
-            staffer.floater || "N/A"
-          }</p>
-          <p><strong>Additional Info:</strong> ${
+          // Add additional details
+          const detailsDiv = document.createElement("div");
+          detailsDiv.classList.add("additional-details");
+          detailsDiv.id = `staffer-${staffer.id}`;
+
+          detailsDiv.innerHTML = `
+            <p><strong>Email:</strong> <span class="value-field" data-field="email" contenteditable="${editMode}">${
+            staffer.email || "N/A"
+          }</span></p>
+            <p><strong>Phone Number:</strong> <span class="value-field" data-field="phone_number" contenteditable="${editMode}">${
+            staffer.phone_number || "N/A"
+          }</span></p>
+            <p><strong>Grad Year:</strong> <span class="value-field" data-field="grad_year" contenteditable="${editMode}">${
+            staffer.grad_year || "N/A"
+          }</span></p>
+            <p><strong>Residence:</strong> <span class="value-field" data-field="residence" contenteditable="${editMode}">${
+            staffer.residence || "N/A"
+          }</span></p>
+            <p><strong>Double-Staffed Selection:</strong> 
+              ${
+                editMode
+                  ? `
+                <select class="value-field" data-field="doubleStaffedSelection">
+                  <option value="">N/A</option>
+                  <option value="solo" ${
+                    staffer.doubleStaffedSelection === "solo" ? "selected" : ""
+                  }>Solo</option>
+                  <option value="either" ${
+                    staffer.doubleStaffedSelection === "either"
+                      ? "selected"
+                      : ""
+                  }>Either</option>
+                  <option value="share" ${
+                    staffer.doubleStaffedSelection === "share" ? "selected" : ""
+                  }>Share</option>
+                </select>
+              `
+                  : `<span class="value-field" data-field="doubleStaffedSelection">${
+                      staffer.doubleStaffedSelection || "N/A"
+                    }</span>`
+              }
+            </p>
+            <p><strong>Floater or Full-Staff:</strong> 
+              ${
+                editMode
+                  ? `
+                <select class="value-field" data-field="floater">
+                  <option value="">N/A</option>
+                  <option value="fullstaff" ${
+                    staffer.floater === "fullstaff" ? "selected" : ""
+                  }>Full Staff</option>
+                  <option value="floater" ${
+                    staffer.floater === "floater" ? "selected" : ""
+                  }>Floater</option>
+                </select>
+              `
+                  : `<span class="value-field" data-field="floater">${
+                      staffer.floater || "N/A"
+                    }</span>`
+              }
+            </p>
+            <p><strong>Additional Info:</strong> <span class="value-field" data-field="additional" contenteditable="${editMode}">${
             staffer.additional || "N/A"
-          }</p>
-          <p><strong>Snacks:</strong> ${staffer.snacks || "N/A"}</p>
-          <p><strong>Concerns:</strong> ${staffer.concerns || "N/A"}</p>
-          <p><strong>Suggestions:</strong> ${staffer.suggestions || "N/A"}</p>
-        `;
+          }</span></p>
+            <p><strong>Snacks:</strong> <span class="value-field" data-field="snacks" contenteditable="${editMode}">${
+            staffer.snacks || "N/A"
+          }</span></p>
+            <p><strong>Concerns:</strong> <span class="value-field" data-field="concerns" contenteditable="${editMode}">${
+            staffer.concerns || "N/A"
+          }</span></p>
+            <p><strong>Suggestions:</strong> <span class="value-field" data-field="suggestions" contenteditable="${editMode}">${
+            staffer.suggestions || "N/A"
+          }</span></p>
+          `;
 
-        detailsDiv.appendChild(removeButton);
-        return detailsDiv;
+          if (editMode) {
+            detailsDiv.classList.add("edit-mode");
+          } else {
+            detailsDiv.classList.remove("edit-mode");
+          }
+
+          // Add buttons
+          const buttonContainer = document.createElement("div");
+          buttonContainer.classList.add("button-container");
+
+          if (editMode) {
+            const saveButton = document.createElement("button");
+            saveButton.classList.add("save-edit-button");
+            saveButton.textContent = "Save All Changes";
+            saveButton.addEventListener("click", async () => {
+              saveButton.disabled = true;
+              saveButton.textContent = "Saving...";
+
+              // Collect updated values
+              const updates = {};
+
+              // Get text field updates
+              detailsDiv.querySelectorAll(".value-field").forEach((field) => {
+                const fieldName = field.getAttribute("data-field");
+                let value;
+
+                if (field.tagName === "SELECT") {
+                  value = field.value;
+                } else {
+                  value = field.textContent.trim();
+                  if (value === "N/A") value = "";
+                }
+
+                // Map field names to database columns
+                const fieldMap = {
+                  email: "email",
+                  phone_number: "phone",
+                  grad_year: "grad",
+                  residence: "residence",
+                  doubleStaffedSelection: "double_shift",
+                  floater: "floater",
+                  additional: "additional",
+                  snacks: "snacks",
+                  concerns: "concerns",
+                  suggestions: "suggestions",
+                };
+
+                if (fieldMap[fieldName]) {
+                  updates[fieldMap[fieldName]] = value;
+                  staffer[fieldName] = value;
+                }
+              });
+
+              // Get shift preference updates
+              const shiftFields = [
+                "monday_shift_9_12",
+                "monday_shift_12_3",
+                "monday_shift_3_6",
+                "monday_shift_6_9",
+                "monday_shift_9_12_pm",
+                "tuesday_shift_9_12",
+                "tuesday_shift_12_3",
+                "tuesday_shift_3_6",
+                "tuesday_shift_6_9",
+                "tuesday_shift_9_12_pm",
+                "wednesday_shift_9_12",
+                "wednesday_shift_12_3",
+                "wednesday_shift_3_6",
+                "wednesday_shift_6_9",
+                "wednesday_shift_9_12_pm",
+                "thursday_shift_9_12",
+                "thursday_shift_12_3",
+                "thursday_shift_3_6",
+                "thursday_shift_6_9",
+                "thursday_shift_9_12_pm",
+                "friday_shift_9_12",
+                "friday_shift_12_3",
+                "friday_shift_3_6",
+                "friday_shift_6_9",
+                "friday_shift_9_12_pm",
+                "saturday_shift_9_12",
+                "saturday_shift_12_3",
+                "saturday_shift_3_6",
+                "saturday_shift_6_9",
+                "saturday_shift_9_12_pm",
+                "sunday_shift_9_12",
+                "sunday_shift_12_3",
+                "sunday_shift_3_6",
+                "sunday_shift_6_9",
+                "sunday_shift_9_12_pm",
+              ];
+
+              const prefSelects =
+                availabilityGrid.querySelectorAll(".pref-select");
+              prefSelects.forEach((select) => {
+                const index = parseInt(select.getAttribute("data-index"));
+                const value = select.value || null;
+                staffer.preferences[index] = value;
+                updates[shiftFields[index]] = value;
+              });
+
+              const success = await updateStaffer(staffer.id, updates);
+              if (success) {
+                isEditing = false;
+                renderContent(false);
+              } else {
+                saveButton.disabled = false;
+                saveButton.textContent = "Save All Changes";
+              }
+            });
+
+            const cancelButton = document.createElement("button");
+            cancelButton.classList.add("cancel-edit-button");
+            cancelButton.textContent = "Cancel";
+            cancelButton.addEventListener("click", () => {
+              // Restore original values
+              Object.assign(staffer, originalValues);
+              staffer.preferences = [...originalValues.preferences];
+              isEditing = false;
+              renderContent(false);
+            });
+
+            buttonContainer.appendChild(saveButton);
+            buttonContainer.appendChild(cancelButton);
+          } else {
+            const editButton = document.createElement("button");
+            editButton.classList.add("edit-button");
+            editButton.textContent = "Edit All Information";
+            editButton.addEventListener("click", () => {
+              originalValues = {
+                ...staffer,
+                preferences: [...staffer.preferences],
+              };
+              isEditing = true;
+              renderContent(true);
+            });
+
+            const removeButton = document.createElement("button");
+            removeButton.classList.add("remove-button");
+            removeButton.textContent = "Remove Staffer";
+            removeButton.addEventListener("click", () => {
+              showConfirmationModal(staffer.fullName, async () => {
+                removeButton.disabled = true;
+                removeButton.textContent = "Removing...";
+
+                const success = await removeStaffer(
+                  staffer.id,
+                  staffer.fullName
+                );
+                if (success) {
+                  window.location.reload();
+                } else {
+                  removeButton.disabled = false;
+                  removeButton.textContent = "Remove Staffer";
+                }
+              });
+            });
+
+            buttonContainer.appendChild(editButton);
+            buttonContainer.appendChild(removeButton);
+          }
+
+          detailsDiv.appendChild(buttonContainer);
+          contentSection.appendChild(detailsDiv);
+        }
+
+        renderContent(false);
+        return contentSection;
       }
 
       async function displayStaffers() {
@@ -868,16 +1334,15 @@
             stafferName.classList.add("staff-name");
             stafferName.textContent = staffer.fullName;
 
-            const contentSection = document.createElement("div");
-            contentSection.classList.add("content-section", "hidden");
+            // Add cannot staff badge if applicable
+            if (staffer.cannot_staff) {
+              const badge = document.createElement("span");
+              badge.classList.add("cannot-staff-badge");
+              badge.textContent = "Cannot Staff";
+              stafferName.appendChild(badge);
+            }
 
-            const availabilityGrid = createAvailabilityGrid(
-              staffer.preferences
-            );
-            const additionalDetails = createAdditionalDetails(staffer);
-
-            contentSection.appendChild(availabilityGrid);
-            contentSection.appendChild(additionalDetails);
+            const contentSection = createStafferSection(staffer);
 
             stafferContainer.appendChild(stafferName);
             stafferContainer.appendChild(contentSection);
@@ -889,10 +1354,12 @@
 
             staffListContainer.appendChild(stafferContainer);
 
-            if (staffer.floater === "floater") {
-              floaterCount++;
-            } else {
-              fullStafferCount++;
+            if (!staffer.cannot_staff) {
+              if (staffer.floater === "floater") {
+                floaterCount++;
+              } else {
+                fullStafferCount++;
+              }
             }
           });
 
